@@ -4,11 +4,9 @@ import datetime
 import random
 import serial
 import sys
-import threading
 import shutil
 import glob
 import pynmea
-import matplotlib
 import pathlib
 import platform
 import os
@@ -130,7 +128,7 @@ def save_serial():
     print("Found active serial ports:")
     print(scan_serial())
     s = input("Please choose a COM port as displayed above:\n")
-    open('config.txt','a').write('com = ' + s)
+    open('config.txt','a').write('com = ' + s + '\n')
 
 def readString(cport):
     ser = serial.Serial(cport,9600,timeout=1)
@@ -139,18 +137,19 @@ def readString(cport):
             pass # Do nothing
         line = ser.readline().decode("utf-8") # Read the entire string
         return line
+    
 
 def verify_serial():
     print("Now going to verify GPS data...")
     with open("config.txt") as f:
         for line in f:
             if "com" in line:
-                cport = line.split("= ",1)[1]
+                port = line.split("= ",1)[1]
+                cport = port.rstrip('\n\r')
                 print(cport)
     print("Waiting for valid GPS string...")
     print(readString(cport))
-
-####INCOMPLETE#########    
+    
 def create_database():
     i = input("Do you wish to manually specify database name? (y/n)\n")
     while True:
@@ -177,10 +176,34 @@ def create_database():
     print("Connected to '"+db+"' OK!")
     c.execute('CREATE TABLE IF NOT EXISTS '+tb+'(fix REAL, lat REAL, lng REAL)')
     conn.commit()
-    #Need to write the db name to config.txt once verified
+    open('config.txt','a').write('db = ' + db)
     print("Tables created OK!")
     return
 
+def raw_log():
+    log_raw = 'log_raw.txt'
+    log_raw_old = 'log_raw.txt.old'
+    print("Looking for log_raw.txt file...")
+    if os.path.exists(log_raw)==False:
+        print("No existing raw gps log file, attempting to create one...")
+        try:
+            open(log_raw,'w')
+            open(log_raw,'w').close
+        except IOError:
+            print("Unable to create file")
+        print("Raw GPS log file created OK!")
+    else:
+        d = input("Raw GPS log file already exists, do you wish to backup and delete contents? (y/n)\n")
+        if d == 'y':
+            try:
+                shutil.copyfile(log_raw,log_raw_old)
+                print("Existing GPS raw log backed up.")
+                open(log_raw,'w')
+                print("GPS raw log now blank.\n")
+            except IOError:
+                print("Unable to read file.")
+        elif d == 'n':
+            input("No worries, raw gps log file left alone ;)")
         
     
     
@@ -193,4 +216,5 @@ scan_serial()
 save_serial()
 verify_serial()
 create_database()
+raw_log()
 
