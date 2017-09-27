@@ -6,6 +6,8 @@ from string import Template
 import sqlite3
 import datetime
 import random
+import pytz
+import tzlocal
 
 ##if os.geteuid() != 0: # Source: https://gist.github.com/davejamesmiller/1965559
 ##    os.execvp("sudo", ["sudo"] + sys.argv)
@@ -72,6 +74,12 @@ def getTime():
     timestring = datetime.datetime.fromtimestamp(epoc).strftime('%Y%m%d%H%M%S%f')
     return(timestring)
 
+def getUTC():
+    local = pytz.timezone ("America/Los_Angeles")
+    naive = datetime.datetime.strptime ("2001-2-3 10:11:12", "%Y-%m-%d %H:%M:%S")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone (pytz.utc)
+
 def getLatLng(latString,lngString):
     latitude = latString[:2].lstrip('0') + "." + "%.7s" % str(float(latString[2:])*1.0/60.0).lstrip("0.")
     lng = lngString[:3].lstrip('0') + "." + "%.7s" % str(float(lngString[3:])*1.0/60.0).lstrip("0.")
@@ -103,16 +111,29 @@ def log(lines):
                 f.write(lat + ',' + lng +'\n')
         except:
             print("nope?")
+      
 
 def splitLines():
+    time = getTime()
     lin = readString()
     line = lin.rstrip('\n\r')
     lines = line.split(",")
-    return(lines)
+    string = [time] + lines
+    return(string)
+
 
 def run():
     while True:
-        print(readString())
+        string = splitLines()
+        time = getTime()
+        if  string[1] == 'GPRMC':
+            print(string)
+            pass
+        elif string[1] == 'GPGGA':
+            print(string)
+            pass
 
-run()
+while True:
+    print(splitLines())
+#run()
 

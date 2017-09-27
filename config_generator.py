@@ -11,6 +11,8 @@ import pathlib
 import platform
 import os
 import socket
+import pytz
+import tzlocal
 
 
 def config_backup():
@@ -46,6 +48,14 @@ def config_backup():
             print("Config now blank.\n")
         except IOError:
             print("Unable to read file.")
+
+def timeZone():
+    local_tz = tzlocal.get_localzone()
+    return(local_tz)
+
+def epocOffset():
+    epoc_offset = time.timezone
+    return(epoc_offset)
                    
 def current_time():
     unix_time = time.time()
@@ -55,10 +65,18 @@ def current_time():
 def check_time():
     while True:
         time = current_time()
+        timezone = timeZone()
+        epocoffset = epocOffset()
         print(time)
-        t = input("Is this the correct time? (y/n):\n")
+        print(timezone)
+        t = input("Is this the correct time and zone? (y/n):\n")
         if t == 'y':
-            open('config.txt','a').write('created = '+ time + '\n')
+            with open('config.txt','a') as running_config:
+                running_config.write('created = %s\n'
+                                     'timezone = %s\n'
+                                     'epocoffset = %s\n'
+                                     % (time, timezone, epocoffset))
+            
             print("OK!\n")
             return
         if t == 'n':
