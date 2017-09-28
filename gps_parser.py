@@ -2,18 +2,12 @@ import serial
 import time
 import os
 import sys
-from string import Template
 import sqlite3
 import datetime
 import random
 import pytz
 import tzlocal
 
-##if os.geteuid() != 0: # Source: https://gist.github.com/davejamesmiller/1965559
-##    os.execvp("sudo", ["sudo"] + sys.argv)
-
-#readString() = raw serial gps lines
-#splitLines() = gps strings split into list
 
 def open_comport():
     with open("config.txt") as f:
@@ -74,11 +68,10 @@ def getTime():
     timestring = datetime.datetime.fromtimestamp(epoc).strftime('%Y%m%d%H%M%S%f')
     return(timestring)
 
-def getUTC():
-    local = pytz.timezone ("America/Los_Angeles")
-    naive = datetime.datetime.strptime ("2001-2-3 10:11:12", "%Y-%m-%d %H:%M:%S")
-    local_dt = local.localize(naive, is_dst=None)
-    utc_dt = local_dt.astimezone (pytz.utc)
+def timeZone():
+    local_tz = tzlocal.get_localzone()
+    return(local_tz)
+
 
 def getLatLng(latString,lngString):
     latitude = latString[:2].lstrip('0') + "." + "%.7s" % str(float(latString[2:])*1.0/60.0).lstrip("0.")
@@ -118,9 +111,14 @@ def splitLines():
     lin = readString()
     line = lin.rstrip('\n\r')
     lines = line.split(",")
-    string = [time] + lines
-    return(string)
+    return(lines)
 
+def stringGen():
+    lines = splitLines()
+    epoc = time.time()
+    epocoffset = time.timezone
+    string = [epoc] + [epocoffset] + lines
+    return(string)
 
 def run():
     while True:
@@ -134,6 +132,6 @@ def run():
             pass
 
 while True:
-    print(splitLines())
+    print(stringGen())
 #run()
 

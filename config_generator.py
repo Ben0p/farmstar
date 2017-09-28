@@ -172,8 +172,8 @@ def create_database():
     i = input("Do you wish to manually specify database name? (y/n)\n")
     while True:
         if i == 'y':
-            tb = input("Please enter desired database name exluding '.db'")
-            db = db_name+'.db'
+            d = input("Please enter desired database name exluding '.db'")
+            db = d+'.db'
             if os.path.exists(db)==False:
                 print("Database '"+db+"' not found, creating one now...")
                 break
@@ -181,8 +181,8 @@ def create_database():
                 print("Found existing database '"+db+"', connecting...")
                 break
         elif i == 'n':
-            tb = platform.node()
-            db = tb+'.db'
+            d = platform.node()
+            db = d+'.db'
             if os.path.exists(db)==False:
                 print("Database '"+db+"' not found, creating one now...")
                 break
@@ -225,14 +225,15 @@ def raw_log():
         
     
     
-    
-config_backup()
-check_time()
-check_system()
-check_serial()
-scan_serial()
-save_serial()
-verify_serial()
-create_database()
-raw_log()
+def run(): 
+    config_backup()
+    check_time()
+    check_system()
+    check_serial()
+    scan_serial()
+    save_serial()
+    verify_serial()
+    create_database()
+    raw_log()
 
+run()
