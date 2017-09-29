@@ -140,7 +140,7 @@ def scan_serial():
             result.append(port)
         except (OSError, serial.SerialException):
             pass
-    return result
+    return(result)
 
 def save_serial():
     print("Found active serial ports:")
@@ -148,28 +148,75 @@ def save_serial():
     s = input("Please choose a COM port as displayed above:\n")
     open('config.txt','a').write('com = ' + s + '\n')
 
-def readString(cport):
-    ser = serial.Serial(cport,9600,timeout=1)
-    while True:
-        while ser.read().decode("utf-8") != '$': # Wait for the begging of the string
-            pass # Do nothing
-        line = ser.readline().decode("utf-8") # Read the entire string
-        return line
-    
-
-def verify_serial():
-    print("Now going to verify GPS data...")
+def open_comport():
     with open("config.txt") as f:
         for line in f:
             if "com" in line:
                 port = line.split("= ",1)[1]
                 cport = port.rstrip('\n\r')
-                print(cport)
+                ser = serial.Serial(cport,9600,timeout=1) # Open Serial port
+                open("config.txt").close
+    return(ser)
+
+ser = open_comport()
+
+def readString():
+    while True:
+        while ser.read().decode("utf-8") != '$': # Wait for the begging of the string
+            pass # Do nothing
+        line = ser.readline().decode("utf-8") # Read the entire string
+        return(line)
+
+def verify_serial():
+    print("Now going to verify GPS data...")
     print("Waiting for valid GPS string...")
-    print(readString(cport))
+    print(readString())
     
+def sentanceList():
+    types = []
+    x = 0
+    print("Scanning for unique GPS sentances...")
+    while x < 20:
+        string = readString()
+        line = string.rstrip('\n\r')
+        lines = line.split(",")
+        sentance = lines[0]
+        types.append(sentance)
+        unique = set(types)
+        x += 1
+    with open('config.txt','a') as running_config:
+        running_config.write("sentances = ")
+        for item in unique:
+            running_config.write("%s," % item)
+        running_config.write('\n')
+    print("Sentance types saved to config")
+    return(lines)
+    
+def getSentances():
+    with open("config.txt") as f:
+        for line in f:
+            if "sentances" in line:
+                sentanc = line.split("= ",1)[1]
+                sentance = sentanc.rstrip(',\n\r')
+                sentances = sentance.split(',')
+                open("config.txt").close
+    return(sentances)
+
+##Not complete, trying to count items in each sentance, half works
+def sentanceItems():
+    strin = readString()
+    string = strin.split(',')
+    sentances = getSentances()
+    lengths = []
+    for i in sentances:
+        if string[0] == i:
+            lengths.append(len(string))
+        print(lengths)
+    
+
 def create_database():
     i = input("Do you wish to manually specify database name? (y/n)\n")
+    tables = getSentances()
     while True:
         if i == 'y':
             d = input("Please enter desired database name exluding '.db'")
@@ -192,11 +239,23 @@ def create_database():
     conn = sqlite3.connect(db)
     c = conn.cursor()
     print("Connected to '"+db+"' OK!")
-    c.execute('CREATE TABLE IF NOT EXISTS '+tb+'(fix REAL, lat REAL, lng REAL)')
-    conn.commit()
+    for i in tables:
+        c.execute("CREATE TABLE IF NOT EXISTS %s (unix INT)" % (i))
+        conn.commit()
+    conn.close()
     open('config.txt','a').write('db = ' + db)
     print("Tables created OK!")
-    return
+    return(db)
+
+
+def populateTables():
+    db = create_database()
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    print("Populating tables...")
+    for i in tables:
+        c.execute("ALTER TABLE ...")
+        conn.close()
 
 def raw_log():
     log_raw = 'log_raw.txt'
@@ -224,7 +283,6 @@ def raw_log():
             input("No worries, raw gps log file left alone ;)")
         
     
-    
 def run(): 
     config_backup()
     check_time()
@@ -233,7 +291,10 @@ def run():
     scan_serial()
     save_serial()
     verify_serial()
+    sentanceList()
+    print(getSentances())
     create_database()
-    raw_log()
+    sentanceItems()
+    #raw_log()
 
 run()
