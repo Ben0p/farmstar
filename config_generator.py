@@ -169,7 +169,7 @@ def readString():
 
 def verify_serial():
     print("Now going to verify GPS data...")
-    print("Waiting for valid GPS string...")
+    print("Waiting for a valid GPS string...")
     print(readString())
     
 def sentanceList():
@@ -202,17 +202,37 @@ def getSentances():
                 open("config.txt").close
     return(sentances)
 
-##Not complete, trying to count items in each sentance, half works
-def sentanceItems():
-    strin = readString()
-    string = strin.split(',')
-    sentances = getSentances()
+##Actually works now?! WTF
+def sentanceLengths():
     lengths = []
-    for i in sentances:
-        if string[0] == i:
-            lengths.append(len(string))
-        print(lengths)
-    
+    x = 0
+    while x < 20:
+        string = readString()
+        line = string.rstrip('\n\r')
+        lines = line.split(",")
+        segment = lines[0],len(lines)
+        lengths.append(segment)
+        unique = set(lengths)
+        x += 1
+    return(unique)
+
+##Didn't expect this to work lels
+def saveSentanceLengths():
+    lengths = sentanceLengths()
+    with open("config.txt",'a') as f:
+        for i in lengths:
+            x = i[0]
+            y = i[1]
+            f.write('%s = %s\n' %(x,y))
+            print('%s = %s' %(x,y))
+    f.close
+
+def saveNumberSentances():
+    sentances = getSentances()
+    numbSent = len(sentances)
+    with open("config.txt",'a') as f:
+        f.write('totalSentances = %s\n' % numbSent)
+    print("There are %s different sentances" % numbSent)
 
 def create_database():
     i = input("Do you wish to manually specify database name? (y/n)\n")
@@ -243,19 +263,32 @@ def create_database():
         c.execute("CREATE TABLE IF NOT EXISTS %s (unix INT)" % (i))
         conn.commit()
     conn.close()
-    open('config.txt','a').write('db = ' + db)
+    with open('config.txt','a') as f:
+        f.write('db = ' + db)
+        f.close
     print("Tables created OK!")
     return(db)
 
-
+#Holy fuck this is some mozart script right here:
 def populateTables():
     db = create_database()
     conn = sqlite3.connect(db)
     c = conn.cursor()
+    lengths = sentanceLengths()
     print("Populating tables...")
-    for i in tables:
-        c.execute("ALTER TABLE ...")
-        conn.close()
+    for i in lengths:
+        table = i[0]
+        number = i[1]
+        x = 1
+        while x <= number:
+            try:
+                c.execute("ALTER TABLE %s ADD COLUMN '%s'" % (table, x))
+            except:
+                x += 1
+                pass
+    conn.commit()
+    conn.close()
+    print("Holy f@#%, it actually worked?!")
 
 def raw_log():
     log_raw = 'log_raw.txt'
@@ -288,13 +321,15 @@ def run():
     check_time()
     check_system()
     check_serial()
-    scan_serial()
+    #scan_serial()
     save_serial()
     verify_serial()
     sentanceList()
     print(getSentances())
-    create_database()
-    sentanceItems()
+    saveSentanceLengths()
+    saveNumberSentances()
+    #create_database()
+    populateTables()
     #raw_log()
 
 run()

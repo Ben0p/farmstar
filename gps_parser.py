@@ -28,63 +28,46 @@ def readString():
         line = ser.readline().decode("utf-8") # Read the entire string
         return line
 
+def splitLines():
+    lin = readString()
+    line = lin.rstrip('\n\r')
+    lines = line.split(",")
+    return(lines)
+
+def stringGen():
+    l = splitLines()
+    t = time.time()
+    l.insert(0,t)
+    return(l)
+
 def db_name():
     with open("config.txt") as f:
         for line in f:
             if "db" in line:
-                database = line.split("= ",1)[1]
-                tb = hn.rstrip('\n\r')
-                db = tb+'.db'
-                open("config.txt").close
-    return(db,tb)
+                d = line.split("= ",1)[1]
+                db = d.rstrip('\n\r')
+                f.close
+    return(db)
 
-def sql_init():
-    database = db_name()
-    db = database[0]
-    tb = database[1]
-    conn = sqlite3.connect(db)
-    print("Databse "+db+" found OK!")
-    c = conn.cursor()
-    return(c)
-    
-def sql_log(lines):
-    fix = getTime(lines[1], "%H%M%S", "%H:%M:%S")
-    latlng = getLatLng(lines[2],lines[4])
-    database = db_name()
-    lat = latlng[0]
-    lng = latlng[1]
-    db = database[0]
-    tb = database[1]
+def sql_log():
+    db = db_name()
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    c.execute("INSERT INTO "+tb+"(fix, lat, lng) VALUES (?, ?, ?)",
-              (fix, lat, lng))
-    conn.commit()
-    
+    x = 0
+    while True:
+        varlist = stringGen()
+        table = varlist[1]
+        var_string = ', '.join('?' * len(varlist))
+        query_string = 'INSERT INTO %s VALUES (%s);' % (table, var_string)
+        c.execute(query_string ,varlist)
+        print('%s string written to db OK!' % table)
+        x += 1
+        if x == 10:
+            conn.commit()
+            x = 0
+            print('commit')
 
-def getTime():
-    epoc = time.time()
-    zone = time.timezone
-    timestring = datetime.datetime.fromtimestamp(epoc).strftime('%Y%m%d%H%M%S%f')
-    return(timestring)
-
-def timeZone():
-    local_tz = tzlocal.get_localzone()
-    return(local_tz)
-
-
-def getLatLng(latString,lngString):
-    latitude = latString[:2].lstrip('0') + "." + "%.7s" % str(float(latString[2:])*1.0/60.0).lstrip("0.")
-    lng = lngString[:3].lstrip('0') + "." + "%.7s" % str(float(lngString[3:])*1.0/60.0).lstrip("0.")
-    line = readString()
-    lines = line.split(",")
-    if lines[3] == 'S':
-        lat = '-'+latitude
-    else:
-        lat = latitude
-    return lat,lng
-
-
+#Not sure if we'll do this?
 def log(lines):
     latlng = getLatLng(lines[2],lines[4])
     lat = latlng[0]
@@ -106,19 +89,6 @@ def log(lines):
             print("nope?")
       
 
-def splitLines():
-    time = getTime()
-    lin = readString()
-    line = lin.rstrip('\n\r')
-    lines = line.split(",")
-    return(lines)
-
-def stringGen():
-    lines = splitLines()
-    epoc = time.time()
-    epocoffset = time.timezone
-    string = [epoc] + [epocoffset] + lines
-    return(string)
 
 def run():
     while True:
@@ -131,7 +101,6 @@ def run():
             print(string)
             pass
 
-while True:
-    print(stringGen())
+sql_log()
 #run()
 
