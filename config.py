@@ -1,4 +1,4 @@
-created = 01/10/2017 17:10:13
+created = 01/10/2017 22:17:26
 timezone = Australia/Perth
 epocoffset = -28800
 architecture = AMD64
@@ -8,14 +8,6 @@ hostname = Bent0Pv2
 system = Windows
 processor = Intel64 Family 6 Model 58 Stepping 9, GenuineIntel
 com = COM5
-sentances = GNGSA,GPMDA,GPHDG,GPHDT,GPGGA,GLGSA,GPGSA,GPGSV,GPRMC,
-GPHDG = 6
-GNGSA = 18
-GPMDA = 21
-GPGSV = 20
-GPRMC = 13
-GPGSA = 18
-GPHDT = 3
-GPGGA = 15
-GLGSA = 18
-totalSentances = 9db = Bent0Pv2.db
+sentencetypes = GPGSA,GPHDT,GPHDG,GLGSA,GPMDA,GNGSA,GPRMC,GPGGA,GPGSV,
+totalSentences = 0
+db = Bent0Pv2.db
