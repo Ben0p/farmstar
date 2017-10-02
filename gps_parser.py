@@ -7,50 +7,34 @@ import datetime
 import random
 import pytz
 import tzlocal
+import config
 
+comport = config.comport
+ser = serial.Serial(comport,9600,timeout=1)
+db = config.db
 
-def open_comport():
-    with open("config.txt") as f:
-        for line in f:
-            if "com" in line:
-                port = line.split("= ",1)[1]
-                cport = port.rstrip('\n\r')
-                ser = serial.Serial(cport,9600,timeout=1) # Open Serial port
-                open("config.txt").close
-    return(ser)
-
-ser = open_comport()                
-
-def readString():
+def serialStream():
+    global ser
     while True:
         while ser.read().decode("utf-8") != '$': # Wait for the begging of the string
             pass # Do nothing
         line = ser.readline().decode("utf-8") # Read the entire string
-        return line
+        return(line)
 
-def splitLines():
-    lin = readString()
+def serialStreamList():
+    lin = serialStream()
     line = lin.rstrip('\n\r')
     lines = line.split(",")
     return(lines)
 
 def stringGen():
-    l = splitLines()
+    l = serialStreamList()
     t = time.time()
     l.insert(0,t)
     return(l)
 
-def db_name():
-    with open("config.txt") as f:
-        for line in f:
-            if "db" in line:
-                d = line.split("= ",1)[1]
-                db = d.rstrip('\n\r')
-                f.close
-    return(db)
-
 def sql_log():
-    db = db_name()
+    global db
     conn = sqlite3.connect(db)
     c = conn.cursor()
     x = 0
@@ -65,29 +49,7 @@ def sql_log():
         if x == 10:
             conn.commit()
             x = 0
-            print('commit')
-
-#Not sure if we'll do this?
-def log(lines):
-    latlng = getLatLng(lines[2],lines[4])
-    lat = latlng[0]
-    lng = latlng[1]
-    log = 'log.txt'
-    if os.path.exists(log)==False:
-        print("No existing gps log file, attempting to create one...")
-        try:
-            open(log,'w')
-            open(log,'w').close
-        except IOError:
-            print("Unable to create log file")
-        print("GPS log file created OK!")
-    else:
-        try:
-            with open(log,"a") as f:
-                f.write(lat + ',' + lng +'\n')
-        except:
-            print("nope?")
-      
+            print('Commit')
 
 
 def run():

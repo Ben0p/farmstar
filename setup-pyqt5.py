@@ -8,7 +8,7 @@ import os
 import shutil
 import socket
 import tzlocal
-import glob
+from PyQt5 import QtWidgets
 
 config = 'config.py'
 oldconfig = 'config.py.old'
@@ -89,6 +89,22 @@ def checkTime():
                     print("Please press 'c' only.")
         else:
             print("Please press either 'y' or 'n'")
+
+def getScreen():
+    app = QtWidgets.QApplication(sys.argv)
+    screen = app.primaryScreen()
+    print('Screen: %s' % screen.name())
+    size = screen.size()
+    print('Size: %d x %d' % (size.width(), size.height()))
+    rect = screen.availableGeometry()
+    print('Available: %d x %d' % (rect.width(), rect.height()))
+    screenname = screen.name()
+    screenwidth = size.width()
+    screenheight = size.height()
+    with open(config,'a') as f:
+        f.write("screenname = '%s'\n" %screenname +
+                "screenwidth = %s\n" %screenwidth +
+                "screenheight = %s\n" %screenheight)
         
 def getSystem():
     global config
@@ -223,26 +239,8 @@ def sentenceLengths():
         segment = lines[0],len(lines)
         lengths.append(segment)
         unique = set(lengths)
-        print
         x += 1
     sentencelengths = unique
-
-#I have no idea what I'm doing here
-#This generates some massive BS spamageddon
-def getMaxSentenceLengths():
-    global sentencelengths
-    global sentencetypes
-    newlist = [['','']]
-    for i in sentencelengths:
-        for j in newlist:
-            if j[0] != i[0]:
-                newlist.append([i[0],i[1]])
-            else:
-                j.append(i[1])
-    print(newlist)            
-    maxlength = max(sentencelengths, key=lambda x: x[1])
-    print(maxlength)
-            
 
 def saveSentenceLengths():
     global sentencelengths
@@ -351,6 +349,7 @@ def raw_log():
 def run(): 
     configBackup()
     checkTime()
+    getScreen()
     getSystem()
     checkSerial()
     scanSerial()
@@ -362,7 +361,6 @@ def run():
     print(sentencetypes)
     sentenceLengths()
     print(sentencelengths)
-    getMaxSentenceLengths()
     saveSentenceLengths()
     saveNumberSentences()
     createDatabase()
