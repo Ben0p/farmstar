@@ -227,22 +227,27 @@ def sentenceLengths():
         x += 1
     sentencelengths = unique
 
-#I have no idea what I'm doing here
-#This generates some massive BS spamageddon
-def getMaxSentenceLengths():
+def tupleToList():
     global sentencelengths
-    global sentencetypes
-    newlist = [['','']]
-    for i in sentencelengths:
-        for j in newlist:
-            if j[0] != i[0]:
-                newlist.append([i[0],i[1]])
-            else:
-                j.append(i[1])
-    print(newlist)            
+    a = sentencelengths
+    b = [list(x) for x in a]
+    return(b)
+
+def merge_subs():
+    global sentencelengths
+    lst_of_lsts = tupleToList()
+    res = []
+    for row in lst_of_lsts:
+        for i, resrow in enumerate(res):
+            if row[0]==resrow[0]:
+                res[i] += row[1:]
+                break
+        else:
+            res.append(row)
+    return res
+    print(res)            
     maxlength = max(sentencelengths, key=lambda x: x[1])
     print(maxlength)
-            
 
 def saveSentenceLengths():
     global sentencelengths
@@ -362,7 +367,8 @@ def run():
     print(sentencetypes)
     sentenceLengths()
     print(sentencelengths)
-    getMaxSentenceLengths()
+    tupleToList()
+    merge_subs()
     saveSentenceLengths()
     saveNumberSentences()
     createDatabase()

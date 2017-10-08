@@ -1,0 +1,2 @@
+sentencetypes = {'GNZDA'}
+sentencetypes = {'GNZDA'}
