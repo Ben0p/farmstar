@@ -9,6 +9,7 @@ import shutil
 import socket
 import tzlocal
 import glob
+from collections import defaultdict
 
 config = 'config.py'
 oldconfig = 'config.py.old'
@@ -20,6 +21,8 @@ sentencetypes = []
 db = 'x'
 sentencelengths = []
 openserial = 'x'
+maxlist = []
+maxitems = []
 
 
 def configBackup():
@@ -186,6 +189,7 @@ def serialStreamList():
     
 def saveSentenceTypes():
     global config
+    global sentencetypes
     types = []
     x = 0
     print("Scanning for unique GPS sentences...")
@@ -195,24 +199,8 @@ def saveSentenceTypes():
         types.append(sentence)
         unique = set(types)
         x += 1
-        print(unique)
-    with open(config,'a') as f:
-        f.write("sentencetypes = %s\n" % unique)
-        #for i in unique:
-        #    f.write("%s," % i)
-        #f.write('\n')
-    print("Sentence types saved to config")
-    
-def getSentenceTypes():
-    global config
-    global sentencetypes
-    with open(config) as f:
-        for line in f:
-            if "sentencetypes" in line:
-                sentenc = line.split("= {",1)[1]
-                sentence = sentenc.rstrip('}\n\r')
-                sentencetypes = sentence.split(',')
-                f.close
+        sentencetypes = unique
+        print(sentencetypes)
 
 def sentenceLengths():
     lengths = []
@@ -223,9 +211,8 @@ def sentenceLengths():
         segment = lines[0],len(lines)
         lengths.append(segment)
         unique = set(lengths)
-        print
         x += 1
-    sentencelengths = unique
+    sentencelengths = unique   
 
 def tupleToList():
     global sentencelengths
@@ -233,30 +220,16 @@ def tupleToList():
     b = [list(x) for x in a]
     return(b)
 
-def merge_subs():
+def groupItems():
     global sentencelengths
-    lst_of_lsts = tupleToList()
-    res = []
-    for row in lst_of_lsts:
-        for i, resrow in enumerate(res):
-            if row[0]==resrow[0]:
-                res[i] += row[1:]
-                break
-        else:
-            res.append(row)
-    return res
-    print(res)            
-    maxlength = max(sentencelengths, key=lambda x: x[1])
-    print(maxlength)
-
-def saveSentenceLengths():
-    global sentencelengths
-    global config
-    with open(config,'a') as f:
-        for i in sentencelengths:
-            x = i[0]
-            y = i[1]
-            f.write('%s = %s\n' %(x,y))
+    global groupitems
+    list_ = sentencelengths
+    group = defaultdict(list)
+    for vs in list_:
+        group[vs[0]] += vs[1:]
+    groupitems = group.items()
+    groupitems = [list(x) for x in groupitems]
+    print(groupitems)
 
 def saveNumberSentences():
     global config
@@ -265,6 +238,39 @@ def saveNumberSentences():
     with open(config,'a') as f:
         f.write('totalSentences = %s\n' % numbSent)
     print("There are %s different sentences" % numbSent)
+
+def maxOnly():
+    global groupitems
+    global maxlist
+    global maxitems
+    global finallist
+    templist = []
+    for list_ in groupitems:
+        for item in list_:
+            for length in item:
+                try:
+                    templist.append(int(length))
+                except ValueError:
+                    pass
+        maxlength = max(templist)
+        maxitems = list_[0], maxlength
+        maxlist.append(maxitems)
+        templist = []
+    maxlist = [list(x) for x in maxlist]
+    print(maxlist)  
+
+def saveValues():
+    global maxlist
+    global groupitems
+    global sentencetypes
+    with open(config, 'a') as f:
+        f.write("groupitems = %s\n" % groupitems)
+        f.write("sentencetypes = %s\n" % sentencetypes)
+        f.write("maxlist = %s\n" % maxlist)
+        for i in maxlist:
+            f.write("%smax = %s\n" %(i[0], i[1]))
+        for i in groupitems:
+            f.write("%s = %s\n" %(i[0], i[1]))
 
 def createDatabase():
     global sentencetypes
@@ -363,14 +369,14 @@ def run():
     openComport()
     verifySerial()
     saveSentenceTypes()
-    getSentenceTypes()
     print(sentencetypes)
     sentenceLengths()
     print(sentencelengths)
     tupleToList()
-    merge_subs()
-    saveSentenceLengths()
+    groupItems()
     saveNumberSentences()
+    maxOnly()
+    saveValues()
     createDatabase()
     populateTables()
     #raw_log()

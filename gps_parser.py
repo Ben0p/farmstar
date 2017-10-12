@@ -12,6 +12,8 @@ import config
 comport = config.comport
 ser = serial.Serial(comport,9600,timeout=1)
 db = config.db
+maxlist = config.maxlist
+sqlint = 10
 
 def serialStream():
     global ser
@@ -51,6 +53,62 @@ def sql_log():
             x = 0
             print('Commit')
 
+def reFormatString():
+    global maxlist
+    global sqlint
+    timer = 0
+    starttime = time.time()
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    while True:
+        lines = stringGen()
+        while lines:
+            lines = stringGen()
+            length = len(lines)
+            table = lines[1]
+            unix = time.time()
+            for i in maxlist:
+                if i[0] == lines[1]:
+                    if i[1]+1 == length:
+                        var_string = ', '.join('?' * length)
+                        query_string = 'INSERT INTO %s VALUES (%s);' % (table, var_string)
+                        c.execute(query_string ,lines)
+                        print('=',lines)
+                    elif i[1]+1 > length:
+                        #print("greater, reformatting...")
+                        diff = i[1]+1-length
+                        #print("diff=", diff)
+                        #sentence = line.rstrip('\n\r').split(",")
+                        #print("Old:", sentence)
+                        checksum = lines[-1]
+                        #print("Checksum:", checksum.rstrip('\n\r'))
+                        slicedstring = lines[:-1]
+                        #print("Sliced: ", slicedstring)
+                        extendedstring = []
+                        extendedstring = slicedstring
+                        for _ in range(diff):
+                            extendedstring.append('')
+                        #print("Extended:", extendedstring)
+                        finalstring = []
+                        finalstring = extendedstring
+                        finalstring.append(checksum)
+                        #print("New: ", finalstring)
+                        length = len(finalstring)
+                        var_string = ', '.join('?' * length)
+                        query_string = 'INSERT INTO %s VALUES (%s);' % (table, var_string)
+                        c.execute(query_string ,finalstring)                        
+                        print('+',finalstring)
+                    elif i[1]+1 < length:
+                        print("less, script failure")
+            timer = unix - starttime
+            if timer >= sqlint:
+                conn.commit()
+                starttime = time.time()
+                timer = 0
+                print("commit")
+    conn.commit()
+    print("commit")
+    print("End of file")
 
 def run():
     while True:
@@ -63,6 +121,7 @@ def run():
             print(string)
             pass
 
-sql_log()
+reFormatString()
+#sql_log()
 #run()
 
