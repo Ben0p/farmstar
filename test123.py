@@ -1,2 +1,5 @@
-sentencetypes = {'GNZDA'}
-sentencetypes = {'GNZDA'}
+maxlist = [['GNGSA', [18]], ['GLGSV', [16, 20]], ['GNGLL', [8]], ['GNGGA', [9, 15]], ['GPGSV', [20]], ['GNZDA', [7]], ['GNRMC', [13]]]
+maxlist = [['GLGSV', [16, 20]], ['GNGLL', [8]], ['GPGSV', [20]], ['GNGGA', [15, 9]], ['GNGSA', [18]], ['GNRMC', [13]], ['GNZDA', [7]]]
+finallist = [('GLGSV', 20), ('GNGLL', 8), ('GPGSV', 20), ('GNGGA', 15), ('GNGSA', 18), ('GNRMC', 13), ('GNZDA', 7)]
+maxlist = [['GNGSA', [18]], ['GNGLL', [8]], ['GLGSV', [20, 16]], ['GNGGA', [15, 9]], ['GNZDA', [7]], ['GNRMC', [13]], ['GPGSV', [20]]]
+finallist = [('GNGSA', 18), ('GNGLL', 8), ('GLGSV', 20), ('GNGGA', 15), ('GNZDA', 7), ('GNRMC', 13), ('GPGSV', 20)]

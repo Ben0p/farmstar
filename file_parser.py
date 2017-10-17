@@ -14,12 +14,13 @@ from collections import defaultdict
 config = 'test123.py'
 oldconfig = 'config.py.old'
 gpsfile = 'serial_test.txt'
+processedfile = 'serial_processed.txt'
 timezone = tzlocal.get_localzone()
 epocoffset = time.timezone
 comportlist = []
 comport = 'x'
 sentencetypes = []
-db = 'x'
+db = 'restringed'
 sentencelengths = []
 openserial = 'x'
 maxitems = []
@@ -96,6 +97,7 @@ def maxOnly():
     global groupitems
     global maxlist
     global maxitems
+    global finallist
     templist = []
     newlist = []
     print(groupitems)
@@ -113,13 +115,58 @@ def maxOnly():
         maxitems = list_[0], maxlength
         print(maxitems)
         newlist.append(maxitems)
-        print(newlist)
         templist = []
-        #maxitems = []
-    print("Holy mother of Jesus, look at that, LOOK AT IT!!")
-    print("Most difficult way to do a thing in the history of things")
-            
-            
+    finallist = newlist
+    print(finallist)
+
+def saveValues():
+    global maxlist
+    global finallist
+    with open(config, 'a') as f:
+        f.write("maxlist = %s\n" % maxlist)
+        f.write("finallist = %s\n" % finallist)
+        for i in maxlist:
+            f.write(i[0] + "max = " + i[1], "\n")
+        for i in finallist:
+            f.write(i[0] + " = " + i[1] + "\n")
+
+def reFormatString():
+    global finallist
+    with open(gpsfile) as f:
+        line = f.readline()
+        while line:
+            r = line.rstrip('\n\r')
+            lines = r.split(",")
+            length = len(lines)
+            for i in finallist:
+                if i[0] == lines[0]:
+                    if i[1] == length:
+                        #print("same")
+                        print(lines)
+                    elif i[1] > length:
+                        #print("greater, reformatting...")
+                        diff = i[1]-length
+                        #print("diff=", diff)
+                        sentence = line.rstrip('\n\r').split(",")
+                        #print("Old:", sentence)
+                        checksum = sentence[-1]
+                        #print("Checksum:", checksum.rstrip('\n\r'))
+                        slicedstring = sentence[:-1]
+                        #print("Sliced: ", slicedstring)
+                        extendedstring = []
+                        extendedstring = slicedstring
+                        for _ in range(diff):
+                            extendedstring.append('')
+                        #print("Extended:", extendedstring)
+                        finalstring = []
+                        finalstring = extendedstring
+                        finalstring.append(checksum)
+                        #print("New: ", finalstring)
+                        print(finalstring)
+                    elif i[1] < length:
+                        print("less, script failure")
+            line = f.readline()
+        
 
 def createDatabase():
     global sentencetypes
@@ -191,6 +238,9 @@ def run():
     groupItems()
     groupToList()
     maxOnly()
+    #saveValues()
+    while True:
+        print(reFormatString())
 ##    saveSentenceTypes()
 ##    getSentenceTypes()
 ##    print(sentencetypes)
