@@ -39,6 +39,13 @@ def readDB():
         alt.append(row[10])
     return(lat,lon,alt)
 
+def getHeading():
+    sql = "SELECT * FROM GPRMC ORDER BY unix DESC LIMIT 1"
+    c.execute(sql)
+    result = c.fetchone()
+    heading = result[9]
+    return(heading)
+
 def convert():
     data = readDB()
     lat = data[0]
@@ -72,13 +79,13 @@ def points():
     return(points)
 
 def tractor_blue():
+    last_heading = float(getHeading())*-1
     img = Image.open('Tractor-Blue.png')
-    img_rot = img.rotate(45, expand=True)
+    img_rot = img.rotate(last_heading, expand=True)
     img_rot.save('Tractor-Blue_rot.png')
     icon_image = 'Tractor-Blue_rot.png'
     icon_size =(32,32)
     icon_anchor = (16,31)
-    angle = 'angle=45'
     icon = CustomIcon(icon_image, icon_size, icon_anchor)
     return(icon)
     
@@ -122,9 +129,12 @@ def plotMap():
     #Add layer control
     folium.LayerControl().add_to(my_map)
     #Save to file
-    my_map.save('201711041430_DarkMatter.html')
+    my_map.save('201711041820_DarkMatter.html')
 
-plotMap()
-c.close()
-conn.close()
-        
+def run():
+    getHeading()
+    plotMap()
+    c.close()
+    conn.close()
+
+run()
