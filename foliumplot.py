@@ -6,12 +6,19 @@ import config
 import psycopg2
 import gmplot
 import folium
+import json
+from folium.plugins import HeatMap
+from folium.features import CustomIcon
+from PIL import Image
+
+
 
 db = config.db
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 conn = sqlite3.connect(db)
 c = conn.cursor()
+
 
 
 # You can convert to float array in several ways
@@ -63,25 +70,59 @@ def points():
     z = data[2]
     points = list(zip(x, y))
     return(points)
+
+def tractor_blue():
+    img = Image.open('Tractor-Blue.png')
+    img_rot = img.rotate(45, expand=True)
+    img_rot.save('Tractor-Blue_rot.png')
+    icon_image = 'Tractor-Blue_rot.png'
+    icon_size =(32,32)
+    icon_anchor = (16,31)
+    angle = 'angle=45'
+    icon = CustomIcon(icon_image, icon_size, icon_anchor)
+    return(icon)
+    
+    
     
 
 def plotMap():
+    icon = tractor_blue()
+    #Gather data
     point_list = points()
     last_point = point_list[-1]
+    #Generate base map position and zoom
     my_map = folium.Map(location=[last_point[0], last_point[1]], zoom_start=18)
+    #Create Groups
     track_group = folium.FeatureGroup(name='Track')
     marker_group = folium.FeatureGroup(name='Marker')
+    heat_group = folium.FeatureGroup(name='Heat Map')
+    vector_group = folium.FeatureGroup(name='Vector')
+    icon_group = folium.FeatureGroup(name='icon')
+    #Set marker positions
     folium.Marker(location=[last_point[0], last_point[1]], popup='Latest').add_to(marker_group)
+    #Test Polygon Marker
+    folium.features.RegularPolygonMarker(location=[last_point[0], last_point[1]], color='black',opacity=1,weight=2,fill_color='blue',fill_opacity=1,number_of_sides=3,rotation=0,radius=15,popup=None).add_to(vector_group)
+    #Test Custom Icon
+    folium.Marker(location=[last_point[0], last_point[1]], icon=icon).add_to(icon_group)
+    #Add base map tiles layers
     folium.TileLayer('cartodbdark_matter').add_to(my_map)
     folium.TileLayer('stamenterrain').add_to(my_map)
     folium.TileLayer('stamentoner').add_to(my_map)
     folium.TileLayer('stamenwatercolor').add_to(my_map)
     folium.TileLayer('cartodbpositron').add_to(my_map)
+    #Add groups to map
     track_group.add_to(my_map)
     marker_group.add_to(my_map)
-    folium.LayerControl().add_to(my_map)
+    heat_group.add_to(my_map)
+    vector_group.add_to(my_map)
+    icon_group.add_to(my_map)
+    #Add data to layer groups
+    HeatMap(point_list).add_to(heat_group)
     folium.PolyLine(point_list).add_to(track_group)
-    my_map.save('DarkMatter.html')
+    #Add layer control
+    folium.LayerControl().add_to(my_map)
+    #Save to file
+    my_map.save('201711041430_DarkMatter.html')
 
 plotMap()
 c.close()
