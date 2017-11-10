@@ -3,8 +3,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http.response import StreamingHttpResponse
 from django.views.decorators.http import require_http_methods
 import subprocess
-from dango.shortcuts import render
-from django.http import HttResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from .import forms
 
 
