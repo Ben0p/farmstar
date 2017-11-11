@@ -43,7 +43,7 @@ def livePos():
                 y = lon[:3].lstrip('0') + "." + "%.7s" % str(float(lon[3:])*1.0/60.0).lstrip("0.")
                 yf = str(y)
                 yfe = float(yf)
-                with open('local_live.geojson','w') as f:
+                with open('live.geojson','w') as f:
                     f.write('{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (yf, xf))
                     print(yf, xf)
                 
