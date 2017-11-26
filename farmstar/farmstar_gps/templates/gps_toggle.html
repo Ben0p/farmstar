@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <style>
 .switch {
   position: relative;
@@ -62,9 +63,36 @@ input:checked + .slider:before {
 <body>
 
 <label class="switch">
-  <input type="checkbox">
-  <span class="slider round"></span>
+	<input type="checkbox" id="gps" onclick="GPStoggle()">
+	<span class="slider round"></span>
 </label>
+<script>
+function GPStoggle()
+{
+    if(document.getElementById('gps').checked)
+    {
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("demo").innerHTML = this.responseText;
+			}
+		};
+		xhttp.open("GET", "GPSon", true);
+		xhttp.send();
+    }
+    else
+    {
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+			document.getElementById("demo").innerHTML = this.responseText;
+			}
+		};
+		xhttp.open("GET", "GPSoff", true);
+		xhttp.send();
+    }
+}
+</script>
 
 </body>
 </html> 

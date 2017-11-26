@@ -10,9 +10,9 @@
 	</style>
 	<script type="text/javascript">
 		function map_init_basic (map) {
-			realtime = L.realtime('http://localhost:8000/map/live.geojson/', {interval: 3 * 1000}).addTo(map);
+			realtime = L.realtime('http://localhost:8000/map/live.geojson/', {interval:10  * 1000}).addTo(map);
 			realtime.on('update', function() {
-				map.fitBounds(realtime.getBounds(), {maxZoom: 17});
+				map.fitBounds(realtime.getBounds(), {maxZoom: 15});
 				map.marker([115.62, -33.36], {icon: greenIcon});
 			});
 		}

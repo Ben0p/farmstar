@@ -24,5 +24,6 @@ from . import views
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='gps_index.html'), name='home'),
     url(r'^toggle', TemplateView.as_view(template_name='gps_toggle.html'), name='toggle'),
-    url(r'^get_name', views.get_name, name='get_name')
+    url(r'^GPSon', views.GPSon),
+    url(r'^GPSoff', views.GPSoff),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
