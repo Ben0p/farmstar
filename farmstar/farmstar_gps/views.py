@@ -7,23 +7,21 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .import forms
 from static_root import gps
+from farmstar_gps.models import STATUS
+from django.http import JsonResponse
 
 def GPSon(request):
-    if request.is_ajax():
-        message = StreamingHttpResponse(staticfiles_storage.open('GPSstatus.json'), content_type="application/json")
-        gps.GPSstatus(True)
-        return message
+    gps.GPSstatus(True)
+    status = STATUS.objects.latest('id').STATUS
+    if status:
+        return JsonResponse({'gps':'on'})
     else:
-        message = StreamingHttpResponse(staticfiles_storage.open('GPSstatus.json'), content_type="application/json")
-        gps.GPSstatus(True)
-        return message        
+        return JsonResponse({'gps':'off'})
 
 def GPSoff(request):
-    if request.is_ajax():
-        message = StreamingHttpResponse(staticfiles_storage.open('GPSstatus.json'), content_type="application/json")
-        gps.GPSstatus(False)
-        return message
+    gps.GPSstatus(False)
+    status = STATUS.objects.latest('id').STATUS
+    if status:
+        return JsonResponse({'gps':'on'})
     else:
-        message = StreamingHttpResponse(staticfiles_storage.open('GPSstatus.json'), content_type="application/json")
-        gps.GPSstatus(False)
-        return message   
+        return JsonResponse({'gps':'off'})

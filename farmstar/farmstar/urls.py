@@ -20,5 +20,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^map/', include('farmstar_map.urls')),
     url(r'^gps/', include('farmstar_gps.urls')),
+    url(r'^clock/', include('farmstar_clock.urls')),
+    url(r'^buttons/', include('farmstar_buttons.urls')),
     
 ]

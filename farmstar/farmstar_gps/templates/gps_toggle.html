@@ -3,6 +3,10 @@
 <head>
 
 <style>
+*{
+	margin: 1;
+	padding: 0;
+}
 .switch {
   position: relative;
   display: inline-block;
@@ -77,7 +81,7 @@ function GPStoggle()
 			document.getElementById("demo").innerHTML = this.responseText;
 			}
 		};
-		xhttp.open("GET", "GPSon", true);
+		xhttp.open("GET", "/gps/GPSon", true);
 		xhttp.send();
     }
     else
@@ -88,7 +92,7 @@ function GPStoggle()
 			document.getElementById("demo").innerHTML = this.responseText;
 			}
 		};
-		xhttp.open("GET", "GPSoff", true);
+		xhttp.open("GET", "/gps/GPSoff", true);
 		xhttp.send();
     }
 }

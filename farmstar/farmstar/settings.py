@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'farmstar_map',
     'farmstar_gps',
+    'farmstar_clock',
+    'farmstar_buttons',
     'leaflet',
     'djgeojson',
 ]
