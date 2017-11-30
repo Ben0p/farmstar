@@ -26,9 +26,10 @@
 				apiKey: '13f9d5354454a0632eb68b10f9f7e0a1',
 				opacity: 0.5
 			});
-			realtime = L.realtime('http://localhost:8000/map/live.geojson/', {interval:10  * 1000}).addTo(map);
+			realtime = L.realtime('http://localhost:8000/map/live.geojson/', {interval:1  * 1000}).addTo(map);
+
 			realtime.on('update', function() {
-				map.fitBounds(realtime.getBounds(), {maxZoom: 15});
+			map.fitBounds(realtime.getBounds(), {maxZoom: 15});
 			});
 			var baseMaps = {"ESRI":Esri_WorldImagery, "Thunder Forrest":Thunderforest_SpinalMap, "DarkMatter":CartoDB_DarkMatter, "Wind": OpenWeatherMap_Temp};
 			L.control.layers(baseMaps).addTo(map);
