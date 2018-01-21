@@ -44,15 +44,26 @@ def testComport():
     except:
         return(False)
 
-#Test the GPS data stream
+#Test the GPS data stream using the checksum value
 def serialTest():
     try:
-        ser = serial.Serial(comport,9600,timeout=1.5)
-        for _ in range(5):
-            line = ser.readline().decode("utf-8")
-            sentence = line.rstrip('\n\r').split(",")
-            #Do the checksum check or sum thing
-            
+        print("Validating GPS data.....")
+        ser = serial.Serial(comport,9600,timeout=1.5) #open serial port
+        for _ in range(5): #read 5 lines only
+            line = ser.readline().decode("utf-8") #read serial line 
+            sentence = line.rstrip('\n\r') #remove the newline
+            data = sentence[1:-3] #Gets 2nd to 4th last character in sentence to get nmea data
+            checksum = sentence[-2:] #Gets last 2 characters (checksum)
+            data_check = 0 #Start the xor operation at 0
+            for c in data: #For each character in the nmea sentence
+                data_check ^= ord(c) #Does a xor operation between previous character and current character
+            hex_checksum = '0x'+checksum.lower() #adds '0x' to the front of the device checksum
+            hex_data = format(data_check, '#04x')#converts to hex)
+            if hex_data == hex_checksum:
+                print("%s = %s.....[OK]" % (hex_checksum, hex_data))
+            else:
+                print("%s != %s.....[Fail]" % (hex_checksum, hex_data))
+                return(False)        
     except:
         return(False)
     
