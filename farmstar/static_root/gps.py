@@ -17,7 +17,6 @@ def serialStream():
     loopcount = 0
     starttime = time.time()
     try:
-        if os.path.exists(db)==False
         conn = sqlite3.connect(db)
         c = conn.cursor()
     except:
