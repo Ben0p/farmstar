@@ -3,13 +3,17 @@ import time
 import os
 import sys
 import sqlite3
-import datetime
+from datetime import datetime
 import config
+
 
 db = config.db
 maxlist = config.maxlist
 sqlint = 10
 comport = config.comport
+
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
 
 def serialStream():
     lines = ['']
@@ -29,7 +33,7 @@ def serialStream():
             line = ser.readline().decode("utf-8") # Read the entire string
             lines = line.rstrip('\n\r').split(",")
             try:
-                livePos(lines)
+                nmeaParser(lines)
                 #logDB(lines)
             except:
                 print("Live position fail")
@@ -40,69 +44,59 @@ def serialStream():
                 print("Disconnecting")
             print("No Connection to %s" % (comport))
             time.sleep(2)
-        
-def livePos(sentence):
+
+def nmeaParser(sentence):
+    try:
         try:
             if sentence[0][3:] == 'GGA':
-                lat = sentence[2]
-                lon = sentence[4]
-                x = lat[:2].lstrip('0') + "." + "%.7s" % str(float(lat[2:])*1.0/60.0).lstrip("0.")
-                if sentence[3] == 'S':
-                    xf = str('-'+x)
-                else:
-                    xf = str(x)
-                y = lon[:3].lstrip('0') + "." + "%.7s" % str(float(lon[3:])*1.0/60.0).lstrip("0.")
-                yf = str(y)            
-                with open('live.geojson','w') as f:
-                    f.write('{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (yf, xf))
-                print(yf,xf)
+                GGA = GGAParse(sentence)
+                lat = GGA[0]
+                lon = GGA[1]
+                #tim = GGA[2]
             else:
-                #return("Invalid String")
                 pass
         except:
-            return("Epic Fail")
+            print("GGA parse error")
+        #Print it all
+        sys.stdout.flush()
+        sys.stdout.write("Latitude: %s\nLongatude: %s   \r" % (lat,lon) )
         
-def logDB(sentence):
-    while True:
-        lines = stringGen()
-        while lines:
-            lines = stringGen() # There is a reason this is here twice, can't remember why
-            length = len(lines)
-            table = lines[1]
-            unix = time.time()
-            for i in maxlist:
-                if i[0] == lines[1]:
-                    if i[1]+1 == length:
-                        var_string = ', '.join('?' * length)
-                        query_string = 'INSERT INTO %s VALUES (%s);' % (table, var_string)
-                        c.execute(query_string ,lines)
-                        #print('=',lines)
-                    elif i[1]+1 > length:
-                        diff = i[1]+1-length
-                        checksum = lines[-1]
-                        slicedstring = lines[:-1]
-                        extendedstring = []
-                        extendedstring = slicedstring
-                        for _ in range(diff):
-                            extendedstring.append('')
-                        finalstring = []
-                        finalstring = extendedstring
-                        finalstring.append(checksum)
-                        length = len(finalstring)
-                        var_string = ', '.join('?' * length)
-                        query_string = 'INSERT INTO %s VALUES (%s);' % (table, var_string)
-                        c.execute(query_string ,finalstring)                        
-                        #print('+',finalstring)
-                    elif i[1]+1 < length:
-                        print("less, script failure :(")
-            timer = unix - starttime
-            if timer >= sqlint:
-                conn.commit()
-                starttime = time.time()
-                timer = 0
-                print("commit")
-    conn.commit()
-    print("commit")
-    print("End of file")
+        #print("Latitude: %s \nLongatude: %s\r" % (lat, lon))
+    except:
+        pass
+
+
+def GGAParse(sentence):
+    try:
+        fix = sentence[1]
+        lat = sentence[2]
+        NS = sentence[3]
+        lon = sentence[4]
+        EW = sentence[5]
+        qlty = sentence[6]
+        sats = sentence[7]
+        acc = sentence[8]
+        alt = sentence[9]
+        altu = sentence[10]
+        geoidh = sentence[11]
+        geoidu = sentence[12]
+        age = sentence[13]
+        dgpsid = sentence[14]
+        #Time
+        #t = datetime.strptime(fix, '%H%M%S')
+        #tf = datetime.strftime(time)
+        #Lattitude
+        x = lat[:2].lstrip('0') + "." + "%.7s" % str(float(lat[2:])*1.0/60.0).lstrip("0.")
+        if NS == 'S':
+            xf = str('-'+x)
+        else:
+            xf = str(x)
+        #Longatude
+        y = lon[:3].lstrip('0') + "." + "%.7s" % str(float(lon[3:])*1.0/60.0).lstrip("0.")
+        yf = str(y)
+        return(xf,yf)
+    except:
+        return("GGA Error")
+
             
 serialStream()
