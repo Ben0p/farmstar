@@ -5,12 +5,17 @@ import sys
 import sqlite3
 from datetime import datetime
 import config
+import curses
 
 
 db = config.db
 maxlist = config.maxlist
 sqlint = 10
 comport = config.comport
+stdscr = curses.initscr()
+
+#Initialize curses screen
+
 
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
@@ -18,8 +23,6 @@ def cls():
 def serialStream():
     lines = ['']
     ser = None
-    loopcount = 0
-    starttime = time.time()
     try:
         conn = sqlite3.connect(db)
         c = conn.cursor()
@@ -33,6 +36,7 @@ def serialStream():
             line = ser.readline().decode("utf-8") # Read the entire string
             lines = line.rstrip('\n\r').split(",")
             try:
+                #print(lines)
                 nmeaParser(lines)
                 #logDB(lines)
             except:
@@ -45,23 +49,39 @@ def serialStream():
             print("No Connection to %s" % (comport))
             time.sleep(2)
 
+def screen(lat,NS,lon,EW,fix,age, sentence):
+        stdscr = curses.initscr()
+        stdscr.clear()
+        stdscr.addstr(1,1," Latitude: %s %s" % (lat, NS))
+        stdscr.addstr(2,1,"Longatude: %s %s" % (lon, EW))
+        stdscr.addstr(3,1," GPS Time: %s" % (fix))
+        stdscr.addstr(4,1,"      Age: %s" % (age))
+        stdscr.addstr(5,1," Sentence: %s" % (sentence))
+        stdscr.refresh()
+
+
 def nmeaParser(sentence):
+    
     try:
         try:
             if sentence[0][3:] == 'GGA':
                 GGA = GGAParse(sentence)
                 lat = GGA[0]
-                lon = GGA[1]
-                #tim = GGA[2]
+                NS = GGA[1]
+                lon = GGA[2]
+                EW = GGA[3]
+                fix = GGA[4]
+                age = GGA[5]
             else:
                 pass
         except:
             print("GGA parse error")
-        #Print it all
-        sys.stdout.flush()
-        sys.stdout.write("Latitude: %s\nLongatude: %s   \r" % (lat,lon) )
-        
-        #print("Latitude: %s \nLongatude: %s\r" % (lat, lon))
+        #screen(lat,NS,lon,EW,fix,age, sentence)
+        #print(lat,NS,lon,EW)
+
+        stdscr.clear()
+        stdscr.addstr(5,1," Sentence: %s" % (sentence))
+        stdscr.refresh()
     except:
         pass
 
@@ -82,9 +102,9 @@ def GGAParse(sentence):
         geoidu = sentence[12]
         age = sentence[13]
         dgpsid = sentence[14]
-        #Time
+        #Fix Time
         #t = datetime.strptime(fix, '%H%M%S')
-        #tf = datetime.strftime(time)
+        #ft = datetime.strftime(time)
         #Lattitude
         x = lat[:2].lstrip('0') + "." + "%.7s" % str(float(lat[2:])*1.0/60.0).lstrip("0.")
         if NS == 'S':
@@ -94,9 +114,8 @@ def GGAParse(sentence):
         #Longatude
         y = lon[:3].lstrip('0') + "." + "%.7s" % str(float(lon[3:])*1.0/60.0).lstrip("0.")
         yf = str(y)
-        return(xf,yf)
+        return(xf,NS,yf,EW,fix, age)
     except:
         return("GGA Error")
-
             
 serialStream()
