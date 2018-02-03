@@ -13,7 +13,7 @@ import pathlib
 import errno
 from datetime import datetime
 
-config = 'config.py'
+config = os.path.join(os.path.dirname(__file__),'config.py')
 oldconfig = 'config.py.old'
 timezone = tzlocal.get_localzone()
 epocoffset = time.timezone
@@ -25,7 +25,7 @@ sentencelengths = []
 openserial = 'x'
 maxlist = []
 maxitems = []
-mydir = os.path.join(os.getcwd(),
+mydir = os.path.join(os.path.dirname(__file__),
                      'Backup',
                      datetime.now().strftime('%Y%m%d%H%M%S'))
 
@@ -295,7 +295,7 @@ def createDatabase():
     while True:
         if i == 'y':
             d = input("Please enter desired database name exluding '.db'")
-            db = d+'.db'
+            db = os.path.join(os.path.dirname(__file__),d+'.db')
             if os.path.exists(db)==False:
                 print("Database '"+db+"' not found, creating one now...")
                 break
@@ -304,7 +304,7 @@ def createDatabase():
                 break
         elif i == 'n':
             d = platform.node()
-            db = d+'.db'
+            db = os.path.join(os.path.dirname(__file__),d+'.db')
             if os.path.exists(db)==False:
                 print("Database '"+db+"' not found, creating one now...")
                 break
@@ -346,11 +346,7 @@ def populateTables():
     conn.commit()
     conn.close()
     print("Wow! Such script! Much completion!")
-    print("Starting gps logging.....")
-    try:
-        import gps
-    except:
-        print("Unable to start gps.py")
+
 
 #Probably won't do this, too taxing on storage?
 def raw_log():
@@ -377,7 +373,16 @@ def raw_log():
                 print("Unable to read file.")
         elif d == 'n':
             input("No worries, raw gps log file left alone ;)")
-        
+
+def start():
+    try:
+        print("Starting gps logging.....")
+        ser.close()
+        time.sleep(2)
+        from farmstar.scripts import gps
+        #os.system('python file.py')
+    except:
+        print("Unable to start gps.py")
     
 def run(): 
     configBackup()
@@ -400,6 +405,7 @@ def run():
     saveValues()
     createDatabase()
     populateTables()
+    start()
     #raw_log()
 
 run()

@@ -8,13 +8,13 @@ import datetime
 def runSetup():
     print("Initiating setup.....")
     try:
-        import auto_setup
+        from farmstar.scripts import setup
     except:
         print("Run setup.....[Fail]")
 
 #Import Config
 try:
-    import config
+    from farmstar.scripts import config
 except:
     print("Import config......[Fail]")
 else:
@@ -107,7 +107,9 @@ def run():
     if test_fails > 0:
         runSetup()
     else:
-        import gps
+        print("Starting GPS...")
+        time.sleep(2)
+        from farmstar.scripts import gps
         
             
 
