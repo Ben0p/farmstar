@@ -26,8 +26,10 @@ openserial = 'x'
 maxlist = []
 maxitems = []
 mydir = os.path.join(os.path.dirname(__file__),
-                     'Backup',
-                     datetime.now().strftime('%Y%m%d%H%M%S'))
+                     'backup',
+                     datetime.now().strftime('%Y'),
+                     datetime.now().strftime('%m'),
+                     datetime.now().strftime('%H%M%S'))
 
 def backupFolder():
     try:
@@ -142,7 +144,6 @@ def checkSerial():
             print("Please press either 'y' or 'n'")
 
 def scanSerial():
-    global comportlist
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in range(256)]
     elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
@@ -156,14 +157,23 @@ def scanSerial():
         try:
             s = serial.Serial(port)
             s.close()
+            ser = serial.Serial(comport,9600,timeout=1.5)
+            ser.readline().decode("utf-8")
             result.append(port)
         except (OSError, serial.SerialException):
             pass
     comportlist = result
 
+def testSerial():
+    for port in comportlist
+    try:
+        ser = serial.Serial(comport,9600,timeout=1.5)
+        ser.readline().decode("utf-8")
+    except:
+        return(False)
+    
+
 def saveSerial():
-    global comportlist
-    global config
     print("Found active serial ports:")
     print(comportlist)
     c = input("Please choose a COM port as displayed above:\n")
@@ -387,9 +397,9 @@ def start():
 def run(): 
     configBackup()
     databaseBackup()
-    checkTime()
+    #checkTime()
     getSystem()
-    checkSerial()
+    #checkSerial()
     scanSerial()
     saveSerial()
     openComport()

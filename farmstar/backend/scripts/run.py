@@ -7,7 +7,11 @@ import datetime
 
 
 #Import Config
-import config
+def getConfig():
+    try:
+        import config
+    except:
+        return(False)
 
 
 #Database name from config check
@@ -71,7 +75,8 @@ def serialTest():
     
 
 #List of functions and description (checks)
-checklist = [[getDB, "Get database name"],
+checklist = [[getConfig, "Get config"],
+             [getDB, "Get database name"],
              [DBfile, "Database file"],
              [getComport, "Get comport"],
              [testComport, "Testing comport"],
@@ -92,14 +97,17 @@ def run():
                 print("%s.....[OK]" %(check_name))
     except:
         print("Self checks.....[Fail]")
-        print("Initiating setup...")
+        print("Initiating setup.....")
         runSetup()
     if test_fails > 0:
         runSetup()
     else:
-        print("Starting GPS...")
+        print("Starting GPS.....")
         time.sleep(2)
-        import gps
+        try:
+            import gps
+        except:
+            print("GPS Processing.....[Fail]")
         
             
 def runSetup():

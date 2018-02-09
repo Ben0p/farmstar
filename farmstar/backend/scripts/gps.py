@@ -5,22 +5,24 @@ import curses
 import subprocess
 import sys
 
+
+comport = 'COM5'
+
 try:
     stdscr = curses.initscr()
 except:
-    raise Exception("Run from a terminal")
+    raise Exception("Run from cmd or bash")
 
 try:
     subprocess.Popen([sys.executable, 'server.py'],
                      stdout=subprocess.PIPE,
                      stderr=subprocess.STDOUT)
 except:
-    raise Exception("Failed to start server")
-    
+    raise Exception("Failed to start server")    
     
 
 def serialStream():
-    comport = 'COM5'
+
     ser = None
     line = ''
     global comstatus
@@ -52,9 +54,12 @@ def serialStream():
 
 def screen():
     stdscr.clear()
-    stdscr.addstr(1,1," COM Status: %s" % (comstatus))
+    stdscr.addstr(1,1,"   COM Port: %s" % (comport))    
+    stdscr.addstr(2,1," COM Status: %s" % (comstatus))
+    stdscr.addstr(2,1,"   Database: %s" % (comstatus))
+    
 
-    stdscr.addstr(3,1,"     String: %s" % (nmea.GGA['String']))
+    stdscr.addstr(4,1,"     String: %s" % (nmea.GGA['String']))
     stdscr.addstr(4,1,"   Sentence: %s" % (nmea.GGA['Sentence']))
     stdscr.addstr(5,1,"   Checksum: %s" % (nmea.GGA['Checksum']))
     stdscr.addstr(6,1," Calculated: %s" % (nmea.GGA['Calculated']))
