@@ -3,9 +3,6 @@ import sys
 import glob
 
 
-
-
-
 def scanSerial():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in range(256)]
