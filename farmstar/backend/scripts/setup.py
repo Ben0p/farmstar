@@ -78,6 +78,8 @@ def timeNow():
     epoc = time.time()
     timenow = str(datetime.fromtimestamp(epoc).strftime('%d/%m/%Y %H:%M:%S'))
     return(epoc,timenow)
+
+
     
 def checkTime():
     global timezone

@@ -3,6 +3,7 @@ import sys
 import glob
 
 
+
 def scanSerial():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in range(256)]
@@ -53,5 +54,6 @@ def scanSerial():
         except:
             pass
     print("GPS Data Found on Ports: %s" % ', '.join(map(str, active)))
+    return(active)
 
-scanSerial()
+

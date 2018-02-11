@@ -1,5 +1,7 @@
 import os
 import platform
+import com
+import serial
 
 
 
@@ -8,6 +10,7 @@ def setGlobals():
     global config
     global dicdir
     global host
+    global comport
 
 '''
 #0 - Set globals
@@ -28,6 +31,25 @@ def setGlobals():
 
 '''
 
+def getCom():
+    comport = com.scanSerial
+     
+
+def readSerial():
+    ser = serial.Serial(comport,9600,timeout=1.5)
+    line = ser.readline().decode('utf-8')
+    sentence = line.rstrip('\n\r').split(',')
+    return(sentence)
+
+
+def gpsTime():
+    while True:
+        sentence = readSerial()
+        if sentence[0] == 'GGA':
+            fixtime = sentence[1]
+            
+
+
 
 def setPaths():
     backdir = os.path.join(os.path.dirname(__file__),
@@ -36,7 +58,8 @@ def setPaths():
                            datetime.now().strftime('%m'),
                            datetime.now().strftime('%H%M%S'))
 
-    config = os.path.join(os.path.dirname(__file__),'config.py')
+    config = os.path.join(os.path.dirname(__file__),
+                          'config.py')
 
     dicdir = os.path.join(os.path.dirname(__file__),
                           'dictionaries')
