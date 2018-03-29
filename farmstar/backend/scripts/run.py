@@ -84,7 +84,7 @@ checklist = [[getConfig, "Get config"],
              ]
 
 # running through checks and printing result
-def run():
+def main():
     test_fails = 0
     try:
         for each_check in checklist:
@@ -117,4 +117,5 @@ def runSetup():
     except:
         print("Run setup.....[Fail]")
         
-run()
+if __name__ == "__main__":
+    main()

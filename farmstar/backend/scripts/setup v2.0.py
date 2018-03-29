@@ -2,18 +2,11 @@ import os
 import platform
 import com
 import serial
+import nmea
+from multiprocessing import Process
 
-
-
-def setGlobals():
-    global backdir
-    global config
-    global dicdir
-    global host
-    global comport
 
 '''
-#0 - Set globals
 #1 - Get GPS com port
 #2 - Get GPS time
 #3 - Get NTP time (try)
@@ -32,14 +25,29 @@ def setGlobals():
 '''
 
 def getCom():
-    comport = com.scanSerial
+    global comports
+    comports = com.scanSerial()
+
      
 
 def readSerial():
-    ser = serial.Serial(comport,9600,timeout=1.5)
-    line = ser.readline().decode('utf-8')
-    sentence = line.rstrip('\n\r').split(',')
-    return(sentence)
+    global ser
+    ser = None
+    global line
+    line = ''
+    comport = comports[0]
+    while True:
+        try:
+            if(ser == None or line == ''):
+                ser = serial.Serial(comport,9600,timeout=1.5)
+            line = ser.readline().decode("utf-8") # Read the entire string
+        except:
+            if(not(ser == None)):
+                ser.close()
+                ser = None
+                comstatus = "Disconnecting"
+            comstatus = str("No Connection to %s" % (comport))
+            time.sleep(2)
 
 
 def gpsTime():
@@ -92,6 +100,10 @@ def configBackup():
 
 
 
+
+if __name__ == '__main__':
+    getCom()
+    readSerial()
             
         
         

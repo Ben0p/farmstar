@@ -2,31 +2,52 @@ import serial
 import sys
 import glob
 
+class Ports():
+    """
+    Scans for active serial ports and then checks those for GPS data, returning a list of valid ports.
+    Optionally pass a list of serial ports to test. eg ["COM1","COM5"]
+    """
+    
+    def __init__(self, ports=None):
+        self.ports = ports
+        self.valid = []
+        self.active = []
+        
+        if self.ports is None:
+            self.scan()
+            if self.active == None:
+                print("No active serial ports")
+            else:
+                for port in self.active:
+                    self.test(port)
+                print("Valid GPS ports = {}".format(self.valid))
+        else:
+            for port in self.ports:
+                self.test(port)
+            print("Valid GPS ports = {}".format(self.valid))        
+    
+    def scan(self):
+        if sys.platform.startswith('win'):
+            ports = ['COM%s' % (i + 1) for i in range(256)]
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            ports = glob.glob('/dev/tty[A-Za-z]*')
+        elif sys.platform.startswith('darwin'):
+            ports = glob.glob('/dev/tty.*')
+        else:
+            raise EnvironmentError('Unsupported platform')
+        for port in ports:
+            try:
+                print("Testing port %s" % (port))
+                ser = serial.Serial(port,9600,timeout=1.5)
+                for _ in range(5):
+                    ser.readline().decode("utf-8")
+                ser.close()
+                self.active.append(port)
+            except (OSError, serial.SerialException):
+                pass
+        print("Active ports = {}".format(self.active))
 
-
-def scanSerial():
-    if sys.platform.startswith('win'):
-        ports = ['COM%s' % (i + 1) for i in range(256)]
-    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-        ports = glob.glob('/dev/tty[A-Za-z]*')
-    elif sys.platform.startswith('darwin'):
-        ports = glob.glob('/dev/tty.*')
-    else:
-        raise EnvironmentError('Unsupported platform')
-    result = []
-    for port in ports:
-        try:
-            print("Testing port %s" % (port))
-            ser = serial.Serial(port,9600,timeout=1.5)
-            for _ in range(5):
-                ser.readline().decode("utf-8")
-            ser.close()
-            result.append(port)
-        except (OSError, serial.SerialException):
-            pass
-    print(result)
-    active = []
-    for port in result:
+    def test(self, port):
         try:
             print("Scanning port %s for GPS data..." % (port))
             ser = serial.Serial(port,9600,timeout=1.5) #open serial port
@@ -47,13 +68,17 @@ def scanSerial():
                 else:
                     print("%s != %s.....[Fail]" % (hex_checksum, hex_data))
             if count == 5:
-                active.append(port)
+                self.valid.append(port)
+                print("GPS Data Found on Port: {}" % ', '.format(port))
             else:
                 print("Invalid data on port %s" % (port))
             ser.close()
         except:
             pass
-    print("GPS Data Found on Ports: %s" % ', '.join(map(str, active)))
-    return(active)
+
+        
 
 
+if __name__ == '__main__':
+    Ports()
+    #Ports(["COM1","COM3","COM5"])
