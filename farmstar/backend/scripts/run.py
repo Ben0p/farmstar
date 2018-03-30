@@ -113,7 +113,7 @@ def main():
 def runSetup():
     print("Initiating setup.....")
     try:
-        import setup
+        setup.run()
     except:
         print("Run setup.....[Fail]")
         
