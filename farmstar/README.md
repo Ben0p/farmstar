@@ -1,97 +1,79 @@
 # Farmstar
-!README NOT COMPLETE!
-Farm management web framework including GPS tracking of machines and task assignment. Designed to run on raspberry pi's however can run on any hardware.
+Farm management system.
 
-## Getting Started
+*NOTE: This is an aspirational side project, migration onto github is in progress.*
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+![Logo v1.0](/docs/media/logojoy-01.1.png?raw=true)
 
-### Prerequisites
+## Vision
+Feed 10 billion people.
 
-Python3 for your OS.
+### Farming Industry problems
+- Expensive proprietary hardware and software in machines.
+- Complicated unintuitive interfaces.
+- Seeding, spraying, harvesting inefficiencies.
+- Aging farming expertise.
+- Fully autonomous tractors are kinda expensive.
+- Some farms here in Australia are bigger than entire countries, mate.
 
-GPS tacking via a serial interface.
-	Primarily designed for the ublox NEO-M8 for the rasberry pi, however should work with any serial GPS device.
-	Can be emulated from a phone through bluetooth, tested with 'Bluetooth GPS Output' app.
+### Mockup
 
-Django web framework
-```
-pip3 install Django
-```
-A whole bunch of other python modules
-```
-pip install awholebunchofshit
-```
+![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
 
-### Installing
+### Goals
+*See TODO for specific project goals*
 
-Download this git and extract
-Open terminal / cmd
-Change to the project directory
-Run django server;
-If only testing localy:
-```
-python3 manage.py runserver 
-```
+#### Short Term
+- Plug and play displays
+- Simple clean interface
+- Free software on cheap hardware
+- On or offline mapping
+- Basic positioning
+- Heatmap of spray area
 
-If accessing on LAN:
-```
-python3 manage.py runserver your.local.ip.address:port
-```
+#### Medium Term
+- Peer-to-peer communication
+- High precision positioning
+- Mapping activities, seeding, harvesting, spraying.
+- Machine messaging
+- Timing of tasks
 
-End with an example of getting some data out of the system or using it for a little demo
 
-## Running the tests
+#### Long Term
+- Machine interfacing
+- Vision systems
+- Navigation
+- Machine health and diagnostics
 
-Explain how to run the automated tests for this system
 
-### Break down into end to end tests
+#### Dream Big
+- Self driving autonomous machines
+- Individual plant health recognition vision system
+- Machine learning optimization of routes
+- End-to-end crop cycle management
 
-Explain what these tests test and why
+### Principles
+- High precision farming at the smallest possible cost.
+- Intuitive and simple as possible.
+- Versatile, work on anything with a screen.
+- Primarily developed for RasberyPi.
+- Ad-hoc peer-to-peer communication.
 
-```
-Give an example
-```
+### Design
+- Primarily written in python
+- WebUI interface
+- Initially using django for web framework
+- Seperate backend and frontend 
+- Backend processes and logs data to sqlite
+- Serve live position and other real-time data to simple .json http GET
+- Django frontend for local and remote WebUI
+- Leaflet mapping with custom tiles and layers.
+- Primary buttons and info overlayed ontop of map
+- Boot to kiosk mode sort of thing.
+- Consideration for multiple GPS receivers, on spray booms and whatever.
+- Plug and play add on hardware such as additional sensors / IO / stereo output / additional screens / whatever
 
-### And coding style tests
 
-Explain what these tests test and why
 
-```
-Give an example
-```
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
 
