@@ -10,7 +10,9 @@ import serial
 '''
 Farmstar nmea data parser
 Converts GPS data into a bunch of dictionaries
-Creates a dictionary of all dictionaries 
+Creates a dictionary of all dictionaries
+REMEMBER TO PUT NEW DICTIONARIES IN THE __init__.py
+Amount of time wasted forgetting that... about 3
 '''
 
 
@@ -20,6 +22,8 @@ class parse():
     #Currently only GGA
     
     def __init__(self, line=None):
+        self.GPS = GPS.GPS
+        self.STATUS = STATUS.STATUS
         self.GGA = GGA.GGA
         self.line = line
     
@@ -36,7 +40,6 @@ class parse():
                 self.parseGGA()
             else:
                 pass
-            self.packALL()
         
 
     def parseGGA(self):
@@ -49,7 +52,7 @@ class parse():
         else:
             self.GGA['Count_bad'] += 1
 
-        self.SPACETIME = fs_time.parse(self.sentence[1]).SPACETIME  
+        self.SPACETIME = fs_time.parse(self.sentence[1]).SPACETIME
         
         self.GGA['Fix'] = self.SPACETIME['fixlocal']
         self.GGA['Local_time'] = self.SPACETIME['localtime']
@@ -70,11 +73,11 @@ class parse():
         self.lon = self.sentence[4][:3].lstrip('0') + "." + "%.7s" % str(float(self.sentence[4][3:])*1.0/60.0).lstrip("0.")
         self.GGA['Longitude'] = float(self.lon)
         self.GGA['East/West'] = self.sentence[5]
+        
+        #Pack SPACETIME and GGA dictionaries into GPS dictionary
+        self.GPS['SPACETIME'] = self.SPACETIME
+        self.GPS['GGA'] = self.GGA
 
-    def packALL(self):
-        #SPACETIME not packing for some reason
-        self.GPS = {'SPACETIME':{},'GGA':self.GGA}
-        pass
 
 class main():
     #main for testing this module
@@ -110,11 +113,8 @@ class main():
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
                 try:
-                    self.GPS = parse(self.line).GPS
-                    self.GGA = self.GPS['GGA']
-                    
-                    for i in self.GGA:
-                        print('{} : {}'.format(i,self.GGA[i]))
+                    #send line to parse
+                    parse(self.line)
                 except:
                     print("NMEA Parse Fail")
             except:
