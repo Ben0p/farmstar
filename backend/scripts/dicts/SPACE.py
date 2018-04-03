@@ -20,5 +20,5 @@ TIME = {'prevfix':'',
         'localdatetimezone':'',
         'localtime':'',
         'timediff':'',
-        'age':'',
+        'age':0,
         }
