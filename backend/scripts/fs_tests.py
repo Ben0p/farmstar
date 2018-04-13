@@ -7,8 +7,7 @@ import datetime
 
 
 '''
-Farmstar backend run script
-Completes self tests
+Farmstar backend tests script
 Runs setup if necessary
 Launches GPS logging once tests pass
 '''
