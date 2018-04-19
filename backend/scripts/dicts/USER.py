@@ -1,4 +1,0 @@
-USER = {'firstname':'',
-        'lastname':'',
-        'dob':'',
-        }
