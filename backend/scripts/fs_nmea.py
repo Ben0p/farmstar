@@ -13,22 +13,24 @@ Converts GPS data into a bunch of dictionaries
 Creates a dictionary of all dictionaries
 REMEMBER TO PUT NEW DICTIONARIES IN THE __init__.py
 Amount of time wasted forgetting that... about 3
-'''
 
+A serious problem where it iterates the entire thing every line
+'''
 
 class parse():
 
     #parse raw nmea data (one line at a time)
     #Currently only GGA
     
-    def __init__(self, line=None):
+    def __init__(self):
         self.GPS = GPS.GPS
         self.STATUS = STATUS.STATUS
         self.GGA = GGA.GGA
         self.GSA = GSA.GSA
         self.GSAALL = GSA.ALL
+
+    def parseLine(self,line=None):
         self.line = line
-    
         if self.line == None:
             print("No data recieved")
         else:
@@ -51,6 +53,8 @@ class parse():
                 self.parseGSA()
             else:
                 pass
+            return(self.GPS)
+
         
     def parseSTATUS(self):
         #Send to checksum parser
@@ -235,14 +239,16 @@ class main():
 
     def run(self):
         self.comport = self.comports[0]
+        self.parse = parse()
         while True:
             try:
                 if(self.ser == None or self.line == ''):
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
+                GPS = self.parse.parseLine(self.line)
                 try:
                     #send line to parse
-                    GPS = parse(self.line).GPS
+                    
                     unix = GPS['SPACETIME']['unix']
                     lat = GPS['GGA']['Latitude']
                     lon = GPS['GGA']['Longitude']
@@ -271,8 +277,6 @@ class main():
                     print("Disconnecting")
                 print("No Connection to {}".format(self.comport))
                 time.sleep(2)
-
-
 
 
 
