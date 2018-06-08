@@ -136,7 +136,7 @@ class parse():
         #GGA Other
         self.GGA['Satellites'] = self.sentence[7]
         self.GGA['Accuracy'] = self.sentence[8]
-        self.GGA['Altitude'] =  self.sentence[9]
+        self.GGA['Altitude'] =  float(self.sentence[9])
         self.GGA['Altitude_Units'] = self.sentence[10]
         self.GGA['GeoID_Height'] = self.sentence[11]
         self.GGA['GeoID_Units'] = self.sentence[12]
@@ -147,7 +147,6 @@ class parse():
         self.GPS['CHECKSUM'] = self.CHECKSUM
 
     def parseGSA(self):        
-
         self.GSA['Count_total'] += 1
         if self.CHECKSUM['valid'] == True:
             self.GSA['Count_good'] += 1
@@ -180,20 +179,20 @@ class parse():
         self.GSA['checksum'] = self.CHECKSUM['checksum']
         
         #Create a list of the different GSA talkers
-        nmealist = self.GSAALL['list']
+        gsalist = self.GSAALL['list']
         #Append current GSA talker
-        nmealist.append(self.nmea)
+        gsalist.append(self.nmea)
         #Unique items only
-        nmealist = list(set(nmealist))
+        gsalist = list(set(gsalist))
         #Sort alphabetically so it's always the same order
-        nmealist.sort()
+        gsalist.sort()
         #Write list back to dictionary
-        self.GSAALL['list'] = nmealist
+        self.GSAALL['list'] = gsalist
         
-
+        
         #This doesn't work, they end up the same no matter what
         #No shit I've tried for days on this one thing
-        self.GSAALL[self.GSA['nmea']] = self.GSA
+        self.GSAALL[self.nmea] = self.GSA
 
         #Write current GSA dictionary to the GSAALL dictionary
         self.GSAALL['GSA'] = self.GSA
@@ -245,16 +244,34 @@ class main():
                 if(self.ser == None or self.line == ''):
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
-                GPS = self.parse.parseLine(self.line)
+                
                 try:
                     #send line to parse
-                    
-                    unix = GPS['SPACETIME']['unix']
-                    lat = GPS['GGA']['Latitude']
-                    lon = GPS['GGA']['Longitude']
-                    alt = GPS['GGA']['Altitude']
-                    data = [unix,lat,lon,alt]
-                    print(data)
+                    self.GPS = self.parse.parseLine(self.line)
+                    self.GGA = self.GPS['GGA']
+                    self.GSA = self.GPS['GSA']
+                    self.ST = self.GPS['SPACETIME']
+                    self.STAT = self.GPS['STATUS']
+                    self.message = self.STAT['message']
+
+                    if self.message == 'GGA':
+                        unix = self.ST['unix']
+                        lat = self.GGA['Latitude']
+                        lon = self.GGA['Longitude']
+                        alt = self.GGA['Altitude']
+                        data = [unix,lat,lon,alt]
+                        print(data)
+                    elif self.message == 'GSA':
+                        GSA0 = self.GSA['list'][0]
+                        GSA1 = self.GSA['list'][1]
+                        GSA2 = self.GSA['list'][2]
+                        if self.GSA['GSA']['nmea'] == GSA0:
+                            print(self.GSA[GSA0]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA1:
+                            print(self.GSA[GSA1]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA2:
+                            print(self.GSA[GSA2]['string'])
+
                     
                     '''
                     STATUS = GPS['STATUS']

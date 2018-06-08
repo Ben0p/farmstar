@@ -7,4 +7,5 @@ __all__ = ['GGA',
            'MESSAGE',
            'TALKER',
            'GEO',
+           'SERIAL',
            ]

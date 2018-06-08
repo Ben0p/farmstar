@@ -46,25 +46,29 @@ class backend():
            os.system('start cmd /K python fs_server.py')
 
         while True:
-            self.serial_stream_1.data()
-            self.line_1 = self.serial_stream_1.line
-            self.status_1 = self.serial_stream_1.status
+            self.serial_data = self.serial_stream_1.data()
+            self.line_1 = self.serial_data['line']
+            self.status_1 = self.serial_data['status']
             self.GPS_1 = self.parseLine.parseLine(self.line_1)
             self.display.screen(self.GPS_1)
             self.SPACETIME = self.GPS_1['SPACETIME']
-            self.GGA = self.GPS_1['GGA']
+            self.STATUS = self.GPS_1['STATUS']
+            self.message = self.STATUS['message']
 
+            
+            #Have to do 'if dict', won't work otherwise
             if type(self.SPACETIME) is dict:
                 self.data[0] = self.SPACETIME['unix']
             else:
                 pass
-
-            if type(self.GGA) is dict:
-                self.data[1] = self.GGA['Latitude']
-                self.data[2] = self.GGA['Longitude']
-                self.data[3] = self.GGA['Altitude']
-            else:
-                pass
+            if self.message == 'GGA':
+                self.GGA = self.GPS_1['GGA']
+                if type(self.GGA) is dict:
+                    self.data[1] = self.GGA['Latitude']
+                    self.data[2] = self.GGA['Longitude']
+                    self.data[3] = self.GGA['Altitude']
+                else:
+                    pass
             
             try:
                 if self.data[0] > self.timer:
