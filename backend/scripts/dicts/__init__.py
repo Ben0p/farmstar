@@ -8,4 +8,6 @@ __all__ = ['GGA',
            'TALKER',
            'GEO',
            'SERIAL',
+           'IPLIST',
+           'XIM'
            ]
