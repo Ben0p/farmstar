@@ -9,5 +9,6 @@ __all__ = ['GGA',
            'GEO',
            'SERIAL',
            'IPLIST',
-           'XIM'
+           'XIM',
+           'FEATURES',
            ]

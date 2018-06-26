@@ -68,8 +68,9 @@ if __name__ == '__main__':
                         data.append(i[key])
                 unix = [time.time()]
                 final_data = unix+data
-                print(data)
-                c.execute(('INSERT INTO {} VALUES (?,?,?,?,?,?,?,?)').format(dev) ,final_data)
+                print(final_data)
+                if len(final_data) == 8:
+                    c.execute(('INSERT INTO {} VALUES (?,?,?,?,?,?,?,?)').format(dev) ,final_data)
                 conn.commit()
     
     

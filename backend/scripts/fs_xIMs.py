@@ -1,20 +1,24 @@
 import json
 import sqlite3
 import re
+from dicts import FEATURES
+
 
 
 con = sqlite3.connect('xim.db')
 c = con.cursor()
 
+collection = FEATURES.COLLECTION
+feature = FEATURES.FEATURE
 
-feature = {"geometry": {"type": "Point", "coordinates": []}, "type": "Feature", "properties": {}}
-    
 
+#Final json not correct, has single quotes rather than double quotes.
 
 def getData():
     c.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = c.fetchall()
-    features = []
+    collection['features'] = []
+    feature_list = {}
     for table in tables:
         match = re.search('''(?<=')\s*[^']+?\s*(?=')''',str(table))
         name = match.group().strip()
@@ -23,11 +27,14 @@ def getData():
         if result != None:
             lat = result[6]
             lon = result[7]
+            name = result[1]
             feature['geometry']['coordinates'] = [lon,lat]
-            features.append(feature)
-            geojson = ''.join(str(e)+',' for e in features)
-            j = json.dumps(geojson)
-    return(j)
+            feature['properties']['title'] = name
+            feature_json = json.dumps(feature)
+            feature_list.append(str(feature))
+    collection['features'] = feature_list
+    collect = json.dumps(collection)
+    return(collect)
 
 
 if __name__ == '__main__':
