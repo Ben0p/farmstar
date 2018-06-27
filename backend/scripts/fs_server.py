@@ -65,7 +65,7 @@ def main():
     xIMs = cors.add(app.router.add_resource("/xIMs"))
     cors.add(
         root.add_route("GET", handle), {
-            "http://127.0.0.1:8000": aiohttp_cors.ResourceOptions(
+            "http://127.0.0.1:4200": aiohttp_cors.ResourceOptions(
                 allow_credentials=True,
                 expose_headers=("X-Custom-Server-Header",),
                 allow_headers=("X-Requested-With", "Content-Type"),
@@ -74,7 +74,7 @@ def main():
         })
     cors.add(
         geoline.add_route("GET", handle_geoline), {
-            "http://127.0.0.1:8000": aiohttp_cors.ResourceOptions(
+            "http://127.0.0.1:4200": aiohttp_cors.ResourceOptions(
                 allow_credentials=True,
                 expose_headers=("X-Custom-Server-Header",),
                 allow_headers=("X-Requested-With", "Content-Type"),
@@ -83,7 +83,7 @@ def main():
         })
     cors.add(
         xIMs.add_route("GET", handle_xIMs), {
-            "http://127.0.0.1:8000": aiohttp_cors.ResourceOptions(
+            "http://127.0.0.1:4200": aiohttp_cors.ResourceOptions(
                 allow_credentials=True,
                 expose_headers=("X-Custom-Server-Header",),
                 allow_headers=("X-Requested-With", "Content-Type"),

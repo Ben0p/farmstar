@@ -5,6 +5,7 @@ from dicts import *
 import fs_checksum
 import fs_time
 import serial
+import copy
 
 
 '''
@@ -192,7 +193,7 @@ class parse():
         
         #This doesn't work, they end up the same no matter what
         #No shit I've tried for days on this one thing
-        self.GSAALL[self.nmea] = self.GSA
+        self.GSAALL[self.nmea] = copy.deepcopy(self.GSA)
 
         #Write current GSA dictionary to the GSAALL dictionary
         self.GSAALL['GSA'] = self.GSA

@@ -4,13 +4,14 @@ COLLECTION = {
     }
 
 FEATURE = {
-    "type": "Feature",
-    "properties": {
-        "title": "",
-        "description": ""
-        },
-    "geometry": {
-        "type": "Point",
-        "coordinates": []
-        }
-    }
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": []
+  },
+  "properties": {
+    "name": ""
+  }
+}
+
+

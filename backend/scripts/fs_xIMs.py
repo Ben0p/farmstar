@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import re
+import copy
 from dicts import FEATURES
 
 
@@ -18,7 +19,7 @@ def getData():
     c.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = c.fetchall()
     collection['features'] = []
-    feature_list = {}
+    feature_list = []
     for table in tables:
         match = re.search('''(?<=')\s*[^']+?\s*(?=')''',str(table))
         name = match.group().strip()
@@ -30,8 +31,8 @@ def getData():
             name = result[1]
             feature['geometry']['coordinates'] = [lon,lat]
             feature['properties']['title'] = name
-            feature_json = json.dumps(feature)
-            feature_list.append(str(feature))
+            dup = copy.deepcopy(feature)
+            feature_list.append(dup)
     collection['features'] = feature_list
     collect = json.dumps(collection)
     return(collect)
