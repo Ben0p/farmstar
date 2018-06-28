@@ -19,11 +19,11 @@ Needs to be initiated from shell for screen to work
 
 class backend():
 
-    def __init__(self,comports=''):
+    def __init__(self, comports=''):
         self.comports = comports
         self.comport()
         self.run()
-        
+
     def comport(self):
         if self.comports == '':
             print("No serial port specified")
@@ -40,11 +40,11 @@ class backend():
         self.display = fs_screen.display()
         self.db = fs_database.logging()
         self.parseLine = fs_nmea.parse()
-        self.data = ['','','','']
+        self.data = ['', '', '', '']
         self.timer = 0
         if os.name == 'nt':
-           os.system('start cmd /K python fs_server.py')
-           os.system('start cmd /K python fs_xIM.py')
+            os.system('start cmd /K python fs_server.py')
+            os.system('start cmd /K python fs_xIM.py')
 
         while True:
             self.serial_data = self.serial_stream_1.data()
@@ -56,8 +56,7 @@ class backend():
             self.STATUS = self.GPS_1['STATUS']
             self.message = self.STATUS['message']
 
-            
-            #Have to do 'if dict', won't work otherwise
+            # Have to do 'if dict', won't work otherwise
             if type(self.SPACETIME) is dict:
                 self.data[0] = self.SPACETIME['unix']
             else:
@@ -70,14 +69,13 @@ class backend():
                     self.data[3] = self.GGA['Altitude']
                 else:
                     pass
-            
+
             try:
                 if self.data[0] > self.timer:
                     self.timer = self.data[0]
                     self.db.data(self.data)
             except:
                 pass
-
 
 
 if __name__ == '__main__':
