@@ -6,7 +6,7 @@ import curses
 import subprocess
 import sys
 import com
-from dicts import *
+from dicts import GPS
 
 '''
 Farmstar screen module

@@ -1,5 +1,6 @@
 import serial
 import time
+import fs_com
 from dicts import SERIAL
 
 '''
@@ -28,7 +29,7 @@ class stream():
             self.line = self.ser.readline().decode(
                 "utf-8").rstrip("\n\r")  # Read the entire string
             self.status = "Running"
-        except:
+        except (OSError, serial.SerialException):
             if(not(self.ser == None)):
                 self.ser.close()
                 self.ser = None
@@ -42,6 +43,8 @@ class stream():
 
 
 if __name__ == '__main__':
-    Stream = stream('COM5')
+    ports = fs_com.ports()
+    gps_port_1 = ports['gps'][0]
+    Stream = stream(gps_port_1)
     while True:
         print(Stream.data())

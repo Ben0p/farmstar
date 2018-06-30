@@ -1,10 +1,11 @@
 import time
 from dateutil import tz
 from datetime import datetime
-from dicts import GPS, GSA, GGA, STATUS, CHECK
+from dicts import GPS, GSA, GGA, STATUS, CHECK, SPACE
 import fs_checksum
 import fs_time
 import fs_com
+import fs_serial
 import serial
 import copy
 
@@ -13,17 +14,12 @@ import copy
 Farmstar nmea data parser
 Converts GPS data into a bunch of dictionaries
 Creates a dictionary of all dictionaries
-REMEMBER TO PUT NEW DICTIONARIES IN THE __init__.py
-Amount of time wasted forgetting that... about 3
-
-A serious problem where it iterates the entire thing every line
 '''
 
 
 class parse():
 
     # parse raw nmea data (one line at a time)
-    # Currently only GGA
 
     def __init__(self):
         self.GPS = GPS.GPS
@@ -60,7 +56,7 @@ class parse():
 
     def parseSTATUS(self):
         # Send to checksum parser
-        self.CHECKSUM = fs_checksum.parse(self.line).CHECKSUM
+        self.CHECKSUM = fs_checksum.parse(self.line)
 
         # Overall status
         self.STATUS['status'] = 'Doing Stuff'
@@ -176,22 +172,22 @@ class parse():
                     }
         self.GSA['mode'] = self.MOD[self.GSA['type']]
         if self.sentence[3] == '':
-            self.GSA['PRNs'] = '-'
+            self.GSA['PRNs'] = '   '
         else:
             self.GSA['PRNs'] = self.sentence[3]
 
         if self.sentence[-3] == '':
-            self.GSA['PDOP'] = '-'
+            self.GSA['PDOP'] = '   '
         else:
             self.GSA['PDOP'] = self.sentence[-3]
 
         if self.sentence[-2] == '':
-            self.GSA['HDOP'] = '-'
+            self.GSA['HDOP'] = '   '
         else:
             self.GSA['HDOP'] = self.sentence[-2]
 
         if self.sentence[-1][-8:-3] == '':
-            self.GSA['VDOP'] = '-'
+            self.GSA['VDOP'] = '   '
         else:
             self.GSA['VDOP'] = self.sentence[-1][-8:-3]
 
@@ -208,8 +204,7 @@ class parse():
         # Write list back to dictionary
         self.GSAALL['list'] = gsalist
 
-        # This doesn't work, they end up the same no matter what
-        # No shit I've tried for days on this one thing
+        # Need to do deepcopy
         self.GSAALL[self.nmea] = copy.deepcopy(self.GSA)
 
         # Write current GSA dictionary to the GSAALL dictionary
@@ -218,97 +213,18 @@ class parse():
         # Write the GSAALL dictionary to the GPS dictionary
         self.GPS['GSA'] = self.GSAALL
 
-        '''
-        print('*'*100)
-        for k in self.GSAALL:
-            print('-'*100)
-            print(k, self.GSAALL[k])
-        '''
-
-
-class main():
-    # main for testing this module
-
-    def __init__(self, comports=''):
-        self.comports = comports
-        self.line = ''
-        self.ser = None
-
-        if self.comports == '':
-            self.getPorts()
-        else:
-            self.run()
-
-    def getPorts(self):
-        print("Scanning for active ports...")
-        self.comports = fs_com.Ports().valid
-        if self.comports == []:
-            print("Unable to find valid gps port")
-            self.comport = None
-        else:
-            self.comport = self.comports[0]
-            self.run()
-
-    def run(self):
-        self.comport = self.comports[0]
-        self.parse = parse()
-        while True:
-            try:
-                if(self.ser == None or self.line == ''):
-                    self.ser = serial.Serial(self.comport, 9600, timeout=1.5)
-                self.line = self.ser.readline().decode("utf-8")  # Read the entire string
-
-                try:
-                    # send line to parse
-                    self.GPS = self.parse.parseLine(self.line)
-                    self.GGA = self.GPS['GGA']
-                    self.GSA = self.GPS['GSA']
-                    self.ST = self.GPS['SPACETIME']
-                    self.STAT = self.GPS['STATUS']
-                    self.message = self.STAT['message']
-
-                    if self.message == 'GGA':
-                        unix = self.ST['unix']
-                        lat = self.GGA['Latitude']
-                        lon = self.GGA['Longitude']
-                        alt = self.GGA['Altitude']
-                        data = [unix, lat, lon, alt]
-                        print(data)
-                    elif self.message == 'GSA':
-                        GSA0 = self.GSA['list'][0]
-                        GSA1 = self.GSA['list'][1]
-                        GSA2 = self.GSA['list'][2]
-                        if self.GSA['GSA']['nmea'] == GSA0:
-                            print(self.GSA[GSA0]['string'])
-                        elif self.GSA['GSA']['nmea'] == GSA1:
-                            print(self.GSA[GSA1]['string'])
-                        elif self.GSA['GSA']['nmea'] == GSA2:
-                            print(self.GSA[GSA2]['string'])
-
-                    '''
-                    STATUS = GPS['STATUS']
-                    message = STATUS['message']
-                    talker = STATUS['talker']
-                    string = STATUS['string']
-                    nmea = STATUS['nmea']
-                    if message == 'GSA':
-                        print('Talker: {}'.format(talker))
-                        print('Message: {}'.format(message))
-                        print('NMEA: {}'.format(nmea))
-                    '''
-
-                except:
-                    print("NMEA Parse Fail")
-            except:
-                if(not(self.ser == None)):
-                    self.ser.close()
-                    self.ser = None
-                    print("Disconnecting")
-                print("No Connection to {}".format(self.comport))
-                time.sleep(2)
-
 
 if __name__ == '__main__':
-    # Uses com module to scan for valid ports if a port isn't specified
-    # main()
-    main(['COM5'])
+
+    ports = fs_com.ports()
+    port = ports['gps'][0]
+    serial = fs_serial.stream(port)
+    nmea = parse()
+    while True:
+        serial_data = serial.data()
+        serial_line = serial_data['line']
+        serial_status = serial_data['status']
+        gps_data = nmea.parseLine(serial_line)
+        print(gps_data)
+        print('')
+

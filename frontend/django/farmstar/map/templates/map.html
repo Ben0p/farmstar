@@ -1,92 +1,228 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8' />
-    <title>Add live realtime data</title>
+    <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
+    {% load static %}
     <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            z-index: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
     </style>
 </head>
+
 <body>
 
-<div id='map'></div>
+    <style>
+        #menu {
+            background: #fff;
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            font-family: 'Open Sans', sans-serif;
+            width: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
 
-<script>
-mapboxgl.accessToken = 'pk.eyJ1IjoiYmVuMCIsImEiOiJjajh1ZDMzNzkweXU5MnJvNmNjOGE1c3UzIn0.lj3vfW_n49fbhc1V46qfUA';
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/ben0/cj8ud4j8we8ip2ts1pi5phr3a',
-    zoom: 0
-});
-
-var url = 'http://127.0.0.1:8001';
-var url2 = 'http://127.0.0.1:8001/geoline';
-var url3 = 'http://127.0.0.1:8001/xIMs';
-
-map.on('load', function () {
-
-    map.addSource('drone', { type: 'geojson', data: url });
-	map.addSource('drone_path', { type: 'geojson', data: url2 });
-	map.addSource('xIMs', { type: 'geojson', data: url3 });
-	map.addControl(new mapboxgl.NavigationControl());
-
-    window.setInterval(function() {
-        map.getSource('drone').setData(url);
-		map.getSource('drone_path').setData(url2);
-		map.getSource('xIMs').setData(url3);
-		var features = map.queryRenderedFeatures({ layers: ['Trucks'] });
-		var droneLngLat = features[0].geometry.coordinates
-		map.flyTo({center: droneLngLat, 
-				'zoom': 12, 
-				'bearing':0, 
-				'pitch':60,
-				'speed':1
-		});
-    }, 1000);
-
-
-
-    map.addLayer({
-        "id": "drone",
-        "type": "symbol",
-        "source": "drone",
-        "layout": {
-            "icon-image": "rocket-15"
-        },
-		"includeGeometry": "true"
-    });
-    map.addLayer({
-        "id": "route",
-        "type": "line",
-        "source": "drone_path",
-        "layout": {
-            "line-join": "round",
-            "line-cap": "round"
-        },
-        "paint": {
-            "line-color": "#888",
-            "line-width": 8
         }
-    });
-    map.addLayer({
-        "id": "Trucks",
-        "type": "symbol",
-        "source": "xIMs",
-        "layout": {
-            "icon-image": "rocket-15"
-        },
-		"includeGeometry": "true"
-    });
-	
 
-	
-});
+        #menu a {
+            font-size: 13px;
+            color: #404040;
+            display: block;
+            margin: 0;
+            padding: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
 
-</script>
+        #menu a:last-child {
+            border: none;
+        }
+
+        #menu a:hover {
+            background-color: #f8f8f8;
+            color: #404040;
+        }
+
+        #menu a.active {
+            background-color: #3887be;
+            color: #ffffff;
+        }
+
+        #menu a.active:hover {
+            background: #3074a4;
+        }
+
+        #layers {
+            background: #fff;
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            left: 10px;
+            border-radius: 3px;
+            width: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            font-family: 'Open Sans', sans-serif;
+            overflow-x: hidden;
+            cursor: pointer;
+            text-align: center;
+            height: 30px;
+            background-image: url("{% static "layers.png" %}");
+            background-size: 30px 30px 
+        }
+    </style>
+
+    <div id="menu"></div>
+    <div id="layers" onclick="openNav()"></div>
+
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYmVuMCIsImEiOiJjajh1ZDMzNzkweXU5MnJvNmNjOGE1c3UzIn0.lj3vfW_n49fbhc1V46qfUA';
+
+        // Set bounds
+        var bounds = [
+            [5.336040, 47.678506], // Southwest coordinates
+            [7.202343, 48.697659]  // Northeast coordinates
+        ];
+
+        var url1 = 'http://127.0.0.1:8001';
+        var url2 = 'http://127.0.0.1:8001/geoline';
+        var url3 = 'http://127.0.0.1:8001/xIMs';
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/ben0/cj8ud4j8we8ip2ts1pi5phr3a',
+            zoom: 0,
+        });
+
+        map.on('load', function () {
+
+            map.addSource('drone', { type: 'geojson', data: url1 });
+            map.addSource('drone_path', { type: 'geojson', data: url2 });
+            map.addSource('xIMs', { type: 'geojson', data: url3 });
+
+            map.addControl(new mapboxgl.NavigationControl());
+
+            window.setInterval(function () {
+                map.getSource('drone').setData(url1);
+                map.getSource('drone_path').setData(url2);
+                map.getSource('xIMs').setData(url3);
+                var features = map.queryRenderedFeatures({ layers: ['drone'] });
+                var droneLngLat = features[0].geometry.coordinates
+            }, 1000);
+
+            map.addLayer({
+                "id": "drone",
+                "type": "symbol",
+                "source": "drone",
+                "layout": {
+                    "icon-image": "rocket-15"
+                },
+                "includeGeometry": "true"
+            });
+            map.addLayer({
+                "id": "route",
+                "type": "line",
+                "source": "drone_path",
+                "layout": {
+                    "line-join": "round",
+                    "line-cap": "round"
+                },
+                "paint": {
+                    "line-color": "#888",
+                    "line-width": 8
+                }
+            });
+            map.addLayer({
+                "id": "Trucks",
+                "type": "symbol",
+                "source": "xIMs",
+                "layout": {
+                    "icon-image": "rocket-15"
+                },
+                "includeGeometry": "true"
+            });
+
+            toggleLayer(['drone'], 'Local');
+            toggleLayer(['route'], 'Path');
+            toggleLayer(['Trucks'], 'Other');
+
+            function toggleLayer(ids, name) {
+                var link = document.createElement('a');
+                link.href = '#';
+                // Get the visibility for all layers in the ids argument.
+                var visibility = ids.map(function (id) {
+                    return map.getLayoutProperty(id, 'visibility');
+                });
+                // Get the unique values.
+                var visUnique = visibility.filter(uniques);
+                // Default to not visible.
+                var visCssClass = '';
+                // If all layers are visible, use the 'active' class so the toggle is "on".
+                if (visUnique.length === 1 && visUnique[0] === 'visible') {
+                    visCssClass = 'active';
+                }
+                link.className = visCssClass;
+                link.textContent = name;
+
+                link.onclick = function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    for (layers in ids) {
+                        var visibility = map.getLayoutProperty(ids[layers], 'visibility');
+
+                        if (visibility === 'visible') {
+                            map.setLayoutProperty(ids[layers], 'visibility', 'none');
+                            this.className = '';
+                        } else {
+                            this.className = 'active';
+                            map.setLayoutProperty(ids[layers], 'visibility', 'visible');
+                        }
+                    }
+
+                };
+
+                var layers = document.getElementById('menu');
+                layers.appendChild(link);
+            }
+
+            // http://stackoverflow.com/a/14438954/1934
+            function uniques(value, index, self) {
+                return self.indexOf(value) === index;
+            }
+
+        })
+
+        function openNav() {
+            document.getElementById('menu').style.width = "70px";
+        }
+
+        function closeNav() {
+            document.getElementById('menu').style.width = "0";
+        }
+
+    </script>
 
 </body>
+
 </html>

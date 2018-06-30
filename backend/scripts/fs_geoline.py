@@ -2,7 +2,7 @@ import fs_database
 import time
 import datetime
 import json
-from dicts import *
+from dicts import GEO
 
 
 class geojson():
