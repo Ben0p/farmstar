@@ -27,9 +27,10 @@ class logging():
                 print("Launched from project root")
                 sys.path.append(os.path.dirname(os.path.join('..')))
                 import data.config
+            self.test()
         except:
             print('Failed')
-        self.test()        
+        
 
     def test(self):
         db_exists = 0
@@ -43,16 +44,8 @@ class logging():
             self.connect()
             print(self.db)
         else:
-            print('No database exists.')
-            self.createDB()
-
-    def createDB(self):
-        print("Creating database...")
-        self.db = os.path.join(self.user_data, 'fsdb.db')
-        conn = sqlite3.connect(self.db)
-        conn.cursor()
-        conn.close()
-        self.connect()
+            print('no database exists')
+            self.db = 'fsdb.db'
 
     def connect(self):
         self.conn = sqlite3.connect(self.db)
@@ -76,13 +69,11 @@ class logging():
 
 
     def data(self, data):
-        if data == ['','','','']:
-            pass
-        else:
-            self.c.execute('INSERT INTO LOCATION VALUES (?,?,?,?)' ,data)
-            self.count += 1
+
+        self.c.execute('INSERT INTO LOCATION VALUES (?,?,?,?)' ,data)
+        self.c.execute("DELETE FROM LOCATION WHERE unix IS NULL OR trim(unix) = ''")
+        self.count += 1
         if self.count > 10:
-            self.c.execute("DELETE FROM LOCATION WHERE unix IS NULL OR trim(unix) = ''")
             self.conn.commit()
             self.count = 0
         
@@ -96,8 +87,7 @@ if __name__ == '__main__':
                   'Longitude':789,
                   'Altitude':101}
            }
-    data = [GPS['SPACETIME']['unix'],GPS['GGA']['Latitude'],GPS['GGA']['Longitude'],GPS['GGA']['Altitude']]
 
                     
     for x in range(11):
-        db.data(data)
+        db.data(GPS)
