@@ -1,0 +1,114 @@
+<div class="container" fxLayout="wrap row" fxLayout.xs="column" fxLayoutAlign="center">
+  <div fxFlex="90">
+    <mat-card class="example-card">
+      <mat-card-header>
+        <div mat-card-avatar class="header-image">
+          <i class="material-icons">assignment</i>
+        </div>
+        <mat-card-title>Assignment</mat-card-title>
+        <mat-card-subtitle>Work in Progress</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab label="Current"> 
+            <h3>Current Assignment</h3>
+           </mat-tab>
+          <mat-tab label="Next">
+              <h3>Next Assignment</h3>
+            </mat-tab>
+          <mat-tab label="Schedule">
+              <h3>Schedule Assignment</h3>
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Farm
+                  </mat-panel-title>
+                  <mat-panel-description>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <mat-radio-group class="radio-group" [(ngModel)]="farm">
+                  <mat-radio-button class="radio-button" *ngFor="let farm of farms" [value]="farm">
+                    {{farm}}
+                  </mat-radio-button>
+                </mat-radio-group>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Operator
+                  </mat-panel-title>
+                  <mat-panel-description>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <mat-form-field>
+                  <mat-select [(value)]="selected">
+                    <mat-option>None</mat-option>
+                    <mat-option value="option1">Option 1</mat-option>
+                    <mat-option value="option2">Option 2</mat-option>
+                    <mat-option value="option3">Option 3</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <p>You selected: {{selected}}</p>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Field
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-radio-group class="radio-group" [(ngModel)]="field">
+                  <mat-radio-button class="radio-button" *ngFor="let field of fields" [value]="field">
+                    {{field}}
+                  </mat-radio-button>
+                </mat-radio-group>
+              </mat-expansion-panel>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Task
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-radio-group class="radio-group" [(ngModel)]="task">
+                  <mat-radio-button class="radio-button" *ngFor="let task of tasks" [value]="task">
+                    {{task}}
+                  </mat-radio-button>
+                </mat-radio-group>
+              </mat-expansion-panel>
+              <mat-expansion-panel [disabled]="spraying">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Spraying
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-checkbox class="checkbox" *ngFor="let track of tracks" [value]="track">
+                  {{track}}
+                </mat-checkbox>
+              </mat-expansion-panel>
+              <mat-expansion-panel disabled="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Seeding
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-checkbox class="checkbox" *ngFor="let track of tracks" [value]="track">
+                  {{track}}
+                </mat-checkbox>
+              </mat-expansion-panel>
+              <mat-expansion-panel disabled="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Harvesting
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-checkbox class="checkbox" *ngFor="let track of tracks" [value]="track">
+                  {{track}}
+                </mat-checkbox>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

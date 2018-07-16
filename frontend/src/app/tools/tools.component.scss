@@ -1,0 +1,25 @@
+  
+  .container {
+    min-width: 180px;
+    margin: -5px;
+ }
+ .container > * {
+    min-width: 180px;
+    margin: 5px;
+ }
+
+
+.container button {
+  width: 160px;
+}
+
+ .button-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.button-row button,
+.a {
+  margin-right: 8px;
+}

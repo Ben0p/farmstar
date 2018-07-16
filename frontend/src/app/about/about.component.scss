@@ -1,0 +1,13 @@
+  .container {
+    min-width: 200px;
+    margin: -5px;
+ }
+ .container > * {
+    min-width: 200px;
+    margin: 5px;
+ }
+
+ .header-image {
+    background-image: url('/assets/github.svg');
+    background-size: cover;
+ }
