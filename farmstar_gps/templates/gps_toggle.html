@@ -81,7 +81,7 @@ function GPStoggle()
 			document.getElementById("demo").innerHTML = this.responseText;
 			}
 		};
-		xhttp.open("GET", "/gps/GPSon", true);
+		xhttp.open("GET", "/gps/True", true);
 		xhttp.send();
     }
     else
@@ -92,7 +92,7 @@ function GPStoggle()
 			document.getElementById("demo").innerHTML = this.responseText;
 			}
 		};
-		xhttp.open("GET", "/gps/GPSoff", true);
+		xhttp.open("GET", "/gps/False", true);
 		xhttp.send();
     }
 }

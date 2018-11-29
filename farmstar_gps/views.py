@@ -6,22 +6,15 @@ import subprocess
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .import forms
-from static_root import gps
 from farmstar_gps.models import STATUS
 from django.http import JsonResponse
 
 def GPSon(request):
-    gps.GPSstatus(True)
+    gps.GPSstatus(request)
     status = STATUS.objects.latest('id').STATUS
-    if status:
-        return JsonResponse({'gps':'on'})
-    else:
-        return JsonResponse({'gps':'off'})
+    return JsonResponse({'gps_status': status})
 
 def GPSoff(request):
-    gps.GPSstatus(False)
+    gps.GPSstatus(request)
     status = STATUS.objects.latest('id').STATUS
-    if status:
-        return JsonResponse({'gps':'on'})
-    else:
-        return JsonResponse({'gps':'off'})
+    return JsonResponse({'gps_status': status})

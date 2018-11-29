@@ -7,26 +7,44 @@ import datetime
 import random
 import pytz
 import tzlocal
-from . import config
-from farmstar_gps.models import STATUS
+import config
+#from farmstar_gps.models import STATUS
 
 
 
 db = config.db
 maxlist = config.maxlist
 sqlint = 10
+comport = config.comport
+#ser = serial.Serial(comport,9600,timeout=1)
 #.isOpen() - checks if comport is open
 
 def serialStream():
-    try:
-        comport = config.comport
-        ser = serial.Serial(comport,9600,timeout=1)
-        while ser.read().decode("utf-8") != '$': # Wait for the begging of the string
+    lines = ['']
+    while True:
+        try:
+            ser = serial.Serial(comport,9600,timeout=1)
+            break
+        except:
+            print("No Connection")
+            time.sleep(2)
+    while True:
+        try:
+            if(ser == None or lines[0] == ''):
+                ser = serial.Serial(comport,9600,timeout=1)
+                print("Reconnecting")
             line = ser.readline().decode("utf-8") # Read the entire string
             lines = line.rstrip('\n\r').split(",")
-            return(lines)
-    except serial.serialutil.SerialException:
-        return(False)
+            print(lines)
+        except:
+            if(not(ser == None)):
+                ser.close()
+                ser = None
+                print("Disconnecting")
+            print("No Connection")
+            time.sleep(2)
+        
+    
 
 ##def serialStreamList():
 ##    while not serialStream():
@@ -38,20 +56,21 @@ def serialStream():
 ##        return(False)
     
 
-def GPSstatus(status):
-    STATUS(UNIX=time.time(), STATUS=status).save() #Save True or False in STATUS table(django model)
-    #p.save()#Save True or False in STATUS table
-    s = STATUS.objects.latest('id').STATUS #Get latest status from table
-    print(s)
-    while s:
-        livePos()
-        obj = STATUS.objects.latest('id')
-        s = obj.STATUS
+##def GPSstatus(status):
+##    STATUS(UNIX=time.time(), STATUS=status).save() #Save True or False in STATUS table(django model)
+##    #p.save()#Save True or False in STATUS table
+##    s = STATUS.objects.latest('id').STATUS #Get latest status from table
+##    print(s)
+##    while s:
+##        livePos()
+##        obj = STATUS.objects.latest('id')
+##        s = obj.STATUS
 
 #Fix this:
 def livePos():
     while serialStream() != False:
         sentence = serialStream()
+        print(sentence)
         if sentence[0] == 'GPGGA':
             lat = sentence[2]
             lon = sentence[4]
@@ -63,3 +82,5 @@ def livePos():
                 f.write('{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (y, x))
             
 
+while True:
+    print(serialStream())
