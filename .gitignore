@@ -6,6 +6,8 @@
 /out-tsc
 
 # dependencies
+/node_modules
+/functions/node_modules
 *node_modules
 
 # IDEs and editors
@@ -41,9 +43,6 @@ Thumbs.db
 # Environment
 /src/environments
 
-# User data
-/data
-
-# Pycache
+# pycache
+*.pycache
 *__pycache__
-*.pyc
