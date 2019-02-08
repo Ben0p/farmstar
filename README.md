@@ -1,35 +1,33 @@
 # Farmstar
 Farm management system.
 
-*NOTE: This is an aspirational side project, migration onto github is in progress.*
+*NOTE: This is a side project, progress is slow.*
 
-![Logo v1.0](/docs/media/logojoy-01.1.png?raw=true)
+![Logo v1.0](/docs/media/logo-125x125.jpg)
 
 ## Vision
-Feed 10 billion people.
+Provide low cost farming management system.
 
 ### Farming Industry problems
 - Expensive proprietary hardware and software in machines.
-- Complicated unintuitive interfaces.
-- Seeding, spraying, harvesting inefficiencies.
 - Aging farming expertise.
-- Fully autonomous tractors are kinda expensive.
 - Some farms here in Australia are bigger than entire countries, mate.
 
-### Mockup
+### Mockup (Rev 2.0)
 
-![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
+![Mockup v1.1](/docs/media/Mockup-v1.2-1.jpg?raw=true)
+![Mockup v1.1](/docs/media/Mockup-v1.2-2.jpg?raw=true)
 
 ### Goals
 *See TODO for specific project goals*
 
 #### Short Term
-- Plug and play displays
+- Plug and play setup on raspberry pi
 - Simple clean interface
-- Free software on cheap hardware
 - On or offline mapping
 - Basic positioning
 - Heatmap of spray area
+- Lat / Lon grids
 
 #### Medium Term
 - Peer-to-peer communication
@@ -38,13 +36,11 @@ Feed 10 billion people.
 - Machine messaging
 - Timing of tasks
 
-
 #### Long Term
 - Machine interfacing
 - Vision systems
 - Navigation
 - Machine health and diagnostics
-
 
 #### Dream Big
 - Self driving autonomous machines
@@ -55,25 +51,21 @@ Feed 10 billion people.
 ### Principles
 - High precision farming at the smallest possible cost.
 - Intuitive and simple as possible.
-- Versatile, work on anything with a screen.
-- Primarily developed for RasberyPi.
+- Versatile and modular hardware
+    - Use cat5/6 cabling anywhere possible
 - Ad-hoc peer-to-peer communication.
+- Offline operation
 
-### Design
-- Primarily written in python
-- WebUI interface
-- Initially using django for web framework
-- Seperate backend and frontend 
-- Backend processes and logs data to sqlite
-- Serve live position and other real-time data to simple .json http GET
-- Django frontend for local and remote WebUI
-- Leaflet mapping with custom tiles and layers.
-- Primary buttons and info overlayed ontop of map
-- Boot to kiosk mode sort of thing.
-- Consideration for multiple GPS receivers, on spray booms and whatever.
-- Plug and play add on hardware such as additional sensors / IO / stereo output / additional screens / whatever
+### Design (Rev 2.0)
+- Python backend scripts
+- Flask Restful API
+- MongoDB
+- Angular 7
+- Mapbox mapping
+- Consideration for multiple GPS receivers.
+- Plug and play add on hardware such as additional sensors / IO / stereo output / cameras
 
-
-
-
-
+### About
+- Extensive knowledge in wireless mesh technologies
+- 10+ years experience in Fleet Management Systems
+- Currently work with Autonomous Hauling (driverless dump trucks)
