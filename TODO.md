@@ -1,18 +1,25 @@
-Tidy this TODO
+# TODO Version 02
 
+## General
+- [x] Delete everything and start again
+- [x] Start TODO list
+- [ ] Folder layout
 
-*See TODO in backend/frontend
+### README
+- [ ] Re-write README
+- [x] List changes
+- [x] Link LICENSE
 
-Make whole thing modular
-Make it more "pythony" 
-Include the if __name__ = __main__ or whatever in the files
+## Frontend
 
-Organise project to upload to github
-Do proper readme and TODO
-do a requirements.txt
-scripts to do complete install from scratch (pip modules and python detection...)
-force python3
-run other scripts as python3 (autodetect environment)
+### General
+- [ ] Clone ngx-admin
 
+## Backend
 
-Test Edit
+### General
+- [ ] Re-write entire thing
+- [ ] Create initial REST API
+
+### Rest API
+- [ ] Impliment [flask intermediate usage](https://flask-restful.readthedocs.io/en/0.3.5/intermediate-usage.html)
