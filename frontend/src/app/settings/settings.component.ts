@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Directive, HostListener } from '@angular/core';
-// import * as screenfull from 'screenfull';
-const screenfull = require('screenfull');
+import * as screenfull from 'screenfull';
+// const screenfull = require('screenfull');
 
 @Component({
   selector: 'app-settings',

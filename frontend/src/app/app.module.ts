@@ -6,7 +6,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { HttpClientModule } from '@angular/common/http';
-import { CalendarModule } from 'angular-calendar';
 import { HttpModule } from '@angular/http';
 
 // material imports
@@ -64,8 +63,7 @@ import { DevicesComponent } from './devices/devices.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    HttpModule,
-    CalendarModule.forRoot(),
+    HttpModule
   ],
   providers: [],
   bootstrap: [AppComponent]
