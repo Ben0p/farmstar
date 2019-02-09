@@ -7,7 +7,7 @@ Farm management system.
 - Complete re-write after much learnings
 - Dropping windows support
     - Dual OS support too time consuming
-    - Might reinstate in the future
+    - May reinstate in the future
 - Using mongoDB rather than sqlite
     - NoSQL easier for json objects and restAPI
     - Allows for separate server if required
