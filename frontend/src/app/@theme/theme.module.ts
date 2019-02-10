@@ -24,6 +24,7 @@ import {
   NbButtonModule,
   NbInputModule,
   NbAccordionModule,
+  NbDatepickerModule,
   NbDialogModule,
   NbWindowModule,
   NbListModule,
@@ -32,7 +33,9 @@ import {
   NbSpinnerModule,
   NbRadioModule,
   NbSelectModule,
+  NbChatModule,
   NbTooltipModule,
+  NbCalendarKitModule,
 } from '@nebular/theme';
 
 import { NbSecurityModule } from '@nebular/security';
@@ -45,7 +48,9 @@ import {
   SwitcherComponent,
   LayoutDirectionSwitcherComponent,
   ThemeSwitcherComponent,
+  TinyMCEComponent,
   ThemeSwitcherListComponent,
+  ToggleSettingsButtonComponent,
 } from './components';
 import {
   CapitalizePipe,
@@ -91,13 +96,16 @@ const NB_MODULES = [
   NbToastrModule,
   NbInputModule,
   NbAccordionModule,
+  NbDatepickerModule,
   NbDialogModule,
   NbWindowModule,
   NbAlertModule,
   NbSpinnerModule,
   NbRadioModule,
   NbSelectModule,
+  NbChatModule,
   NbTooltipModule,
+  NbCalendarKitModule,
 ];
 
 const COMPONENTS = [
@@ -109,10 +117,12 @@ const COMPONENTS = [
   FooterComponent,
   SearchInputComponent,
   ThemeSettingsComponent,
+  TinyMCEComponent,
   OneColumnLayoutComponent,
   SampleLayoutComponent,
   ThreeColumnsLayoutComponent,
   TwoColumnsLayoutComponent,
+  ToggleSettingsButtonComponent,
 ];
 
 const ENTRY_COMPONENTS = [
@@ -137,9 +147,13 @@ const NB_THEME_PROVIDERS = [
   ).providers,
   ...NbSidebarModule.forRoot().providers,
   ...NbMenuModule.forRoot().providers,
+  ...NbDatepickerModule.forRoot().providers,
   ...NbDialogModule.forRoot().providers,
   ...NbWindowModule.forRoot().providers,
   ...NbToastrModule.forRoot().providers,
+  ...NbChatModule.forRoot({
+    messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
+  }).providers,
 ];
 
 @NgModule({
