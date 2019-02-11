@@ -255,4 +255,32 @@ export const MENU_ITEMS: NbMenuItem[] = [
       },
     ],
   },
+  {
+    title: 'Styles',
+    icon: 'nb-drop',
+    children: [
+      {
+        title: 'Themes',
+        link: '/pages/styles/themes',
+      },
+      {
+        title: 'Layouts',
+        link: '/pages/styles/layouts',
+      },
+      {
+        title: 'Sidebar',
+        link: '/pages/styles/sidebar',
+      },
+    ],
+  },
+  {
+    title: 'Info',
+    icon: 'nb-lightbulb',
+    children: [
+      {
+        title: 'About',
+        link: '/pages/info/about',
+      },
+    ],
+  },
 ];
